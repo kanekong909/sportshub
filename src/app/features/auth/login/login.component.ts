@@ -20,11 +20,11 @@ import { AuthService } from '../../../core/services/auth.service';
 
         <div class="form-group">
           <label>Email</label>
-          <input type="email" [(ngModel)]="email" placeholder="tu@email.com" />
+          <input type="email" [(ngModel)]="email" placeholder="tu@email.com" class="text-black" />
         </div>
         <div class="form-group">
           <label>Contraseña</label>
-          <input type="password" [(ngModel)]="password" placeholder="••••••••" />
+          <input type="password" [(ngModel)]="password" placeholder="••••••••" class="text-black" />
         </div>
 
         <button class="btn-primary" (click)="login()" [disabled]="loading()">
