@@ -1,0 +1,636 @@
+/* ============================================ */
+/* ESTRUCTURA GENERAL Y PANTALLA DE CARGA */
+/* ============================================ */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 14px;
+}
+
+.detail-page {
+  min-height: calc(100vh - 56px);
+  padding-bottom: 40px;
+}
+
+/* ============================================ */
+/* SECCIÓN HERO (CABECERA DEL EQUIPO) */
+/* ============================================ */
+.hero {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 24px 16px 0;
+}
+
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hero-crest {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.hero-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+
+.hero-crest span {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.hero-info {
+  flex: 1;
+}
+
+.hero-league {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #cbd5e1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-item img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+/* Botón de Seguir / Favorito */
+.btn-fav {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  align-self: flex-start;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-fav:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-fav.active {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+/* Bloque Inferior de Estadísticas en el Hero */
+.hero-stats {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hstat {
+  padding: 18px 12px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hstat:nth-child(2n) {
+  border-right: none;
+}
+
+.hstat-val {
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.hstat-lbl {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* NAVEGACIÓN SECUNDARIA (TABS) */
+/* ============================================ */
+.subnav {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0 16px;
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.snav {
+  padding: 16px 14px;
+  font-size: 13px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #94a3b8;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.snav:hover {
+  color: #ffffff;
+}
+
+.snav.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+/* ============================================ */
+/* SECCIÓN DE CONTENIDO Y TARJETAS CONTENEDORAS */
+/* ============================================ */
+.content {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 24px;
+  padding-left: 12px;
+  border-left: 4px solid #3b82f6;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* ============================================ */
+/* PESTAÑA DE PLANTILLA (SQUAD GRID) */
+/* ============================================ */
+.squad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 12px;
+}
+
+.squad-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 16px 10px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.squad-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.team-card-glow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  opacity: 0.1;
+  filter: blur(24px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.squad-card:hover .team-card-glow {
+  opacity: 0.2;
+  transform: translateX(-50%) scale(1.2);
+}
+
+.sq-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.squad-card:hover .sq-photo {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.sq-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sq-photo span {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.5px;
+}
+
+.sq-num {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.sq-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 4px 0 10px;
+  line-height: 1.3;
+}
+
+.pos-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Colores de Posición Homologados */
+.pos-gk {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.pos-def {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.pos-mid {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.pos-fwd {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.pos-pg,
+.pos-sg,
+.pos-sf,
+.pos-pf,
+.pos-c {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+.pos-qb,
+.pos-rb,
+.pos-wr,
+.pos-te,
+.pos-lb,
+.pos-cb {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+}
+
+/* ============================================ */
+/* HISTORIA (TIMELINE) */
+/* ============================================ */
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tl-item:last-child {
+  border-bottom: none;
+}
+
+.tl-year {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3b82f6;
+  min-width: 55px;
+  padding-top: 2px;
+}
+
+.tl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.tl-text {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+/* ============================================ */
+/* TABLAS DE ESTADÍSTICAS */
+/* ============================================ */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 650px;
+}
+
+.stats-table th {
+  padding: 12px;
+  text-align: left;
+  color: #94a3b8;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.stats-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+.stats-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: #ffffff;
+}
+
+.stats-table b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ============================================ */
+/* DETALLE DEL ESTADIO */
+/* ============================================ */
+.stadium-info {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.si-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+
+.si-row:last-child {
+  border-bottom: none;
+}
+
+.si-row span {
+  color: #94a3b8;
+}
+
+.si-row b {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ============================================ */
+/* PALMARÉS (TITLES GRID) */
+/* ============================================ */
+.titles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.title-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+.title-chip:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+.title-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.title-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.title-count {
+  font-size: 13px;
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+/* ============================================ // COMPORTAMIENTO MEDIANO (TABLETS - 640px+) // ============================================ */
+@media (min-width: 640px) {
+  .hero {
+    padding: 36px 24px 0;
+  }
+
+  .hero-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .hero-crest {
+    width: 100px;
+    height: 100px;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  .hero-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .btn-fav {
+    align-self: center;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hstat {
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 20px 16px;
+  }
+
+  .hstat:last-child {
+    border-right: none;
+  }
+
+  .stadium-info {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 32px;
+  }
+
+  .si-row:nth-last-child(2):nth-child(odd) {
+    border-bottom: none;
+    /* Limpieza estética de filas */
+  }
+}
+
+/* ============================================ // COMPORTAMIENTO GRANDE (DESKTOP - 1024px+) // ============================================ */
+@media (min-width: 1024px) {
+  .content {
+    margin: 32px auto;
+  }
+
+  .card {
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .squad-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+}
+
+/* REDUCCIÓN DE ANIMACIONES POR ACCESIBILIDAD */
+@media (prefers-reduced-motion: no-preference) {
+
+  .squad-card,
+  .sq-photo,
+  .btn-fav,
+  .snav,
+  .title-chip,
+  .team-card-glow {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

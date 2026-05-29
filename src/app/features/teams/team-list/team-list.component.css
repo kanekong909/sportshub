@@ -1,0 +1,626 @@
+/* MOBILE-FIRST (base: < 640px) */
+.page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  min-height: calc(100vh - 56px);
+  padding: 24px 16px;
+}
+
+.page-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* HEADER */
+.page-header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+/* FILTROS */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(148, 163, 184, 0.6);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  font-size: 14px;
+  color: #f1f5f9;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.search-input:focus {
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sport-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sport-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  cursor: pointer;
+  color: rgba(148, 163, 184, 0.8);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sport-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+
+.sport-pill.active {
+   background: linear-gradient(135deg, #d73bf68c, #2564eb85);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 14px;
+}
+
+/* TEAMS GRID - mobile (1 columna) */
+.teams-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* ============================================ */
+/* MEJORA DE ESTILOS PARA LAS CARDS */
+/* ============================================ */
+
+.team-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px; /* Bordes un poco más suaves */
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  backdrop-filter: blur(8px); /* Efecto cristal sutil */
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto Hover Avanzado */
+.team-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-4px) scale(1.01);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4),
+              0 0 15px rgba(255, 255, 255, 0.03);
+}
+
+/* El resplandor de fondo ahora reacciona al pasar el mouse */
+.team-card-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  opacity: 0.12;
+  filter: blur(35px);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.team-card:hover .team-card-glow {
+  opacity: 0.25;
+  transform: scale(1.2) translate(-10px, 10px);
+}
+
+/* Escudo / Contenedor del Logo */
+.card-crest {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s ease;
+}
+
+/* El logo sobresale sutilmente al hacer hover */
+.team-card:hover .card-crest {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+.card-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px; /* Reducido un poco para que el logo se vea más grande */
+}
+
+/* Cuerpo de la tarjeta */
+.card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+.card-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Tags de ligas y deportes */
+.card-tags {
+  display: flex;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sport-tag {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Flecha de acción estilizada */
+.card-arrow {
+  color: rgba(148, 163, 184, 0.3);
+  font-size: 20px;
+  font-weight: 300;
+  padding-left: 4px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.team-card:hover .card-arrow {
+  transform: translateX(6px);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================ */
+/* TABLET (640px y más) */
+/* ============================================ */
+@media (min-width: 640px) {
+  .page {
+    padding: 32px 24px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .filters {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .search-wrapper {
+    width: 280px;
+    flex-shrink: 0;
+  }
+
+  .sport-filters {
+    flex-wrap: nowrap;
+  }
+
+  .teams-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+/* ============================================ */
+/* DESKTOP (1024px y más) */
+/* ============================================ */
+@media (min-width: 1024px) {
+  .page {
+    padding: 40px 32px;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 24px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .search-wrapper {
+    width: 320px;
+  }
+
+  .teams-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  .team-card {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .card-crest {
+    width: 64px;
+    height: 64px;
+  }
+
+  .card-name {
+    font-size: 18px;
+  }
+
+  .card-meta {
+    font-size: 12px;
+  }
+
+  .tag {
+    font-size: 11px;
+  }
+}
+
+/* ============================================ */
+/* XL SCREENS (1440px y más) */
+/* ============================================ */
+@media (min-width: 1440px) {
+  .page {
+    padding: 48px 40px;
+  }
+
+  .page-inner {
+    max-width: 1200px;
+  }
+
+  .teams-grid {
+    gap: 20px;
+  }
+}
+
+/* Animaciones */
+@media (prefers-reduced-motion: no-preference) {
+  .team-card,
+  .sport-pill,
+  .search-input,
+  .card-arrow {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* FILTROS DE LIGA */
+/* ============================================
+   ESTILOS PARA FILTRO DE LIGAS
+   ============================================ */
+
+/* Filtro de ligas */
+.league-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+  position: relative;
+}
+
+/* Estilo premium para los botones de liga */
+.league-pill {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 40px;
+  border: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #cbd5e1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Efecto de brillo en hover */
+.league-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.league-pill:hover::before {
+  left: 100%;
+}
+
+.league-pill:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  transform: translateY(-2px);
+  color: #f1f5f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Estado activo con gradiente vibrante */
+.league-pill.active {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1, #3b82f6);
+  background-size: 200% 200%;
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Tooltip moderno */
+.league-pill {
+  position: relative;
+}
+
+.league-pill[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 100;
+  font-weight: normal;
+  letter-spacing: normal;
+}
+
+.league-pill:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.league-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.league-icon:nth-child(7) {
+  background: white;
+}
+
+.league-count {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.league-pill.active .league-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* TODAS LAS LIGAS BADGE */
+/* Badge "Todas las ligas" especial */
+.league-pill:first-child {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.league-pill:first-child.active {
+  background: linear-gradient(135deg, #d73bf68c, #2564eb85);
+  border: none;
+}
+
+/* Filtros activos */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.active-filters-label {
+  font-size: 12px;
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 12px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  color: #60a5fa;
+}
+
+.remove-filter {
+  background: none;
+  border: none;
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-filter:hover {
+  color: #fff;
+}
+
+.clear-all-btn {
+  padding: 4px 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-all-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fff;
+}
+
+.clear-filters-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* Responsive para filtros */
+@media (min-width: 640px) {
+  .league-filters {
+    margin-top: 0;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .league-filters {
+    order: 3;
+  }
+
+  .active-filters {
+    order: 4;
+  }
+}
+
+/* Animación de entrada */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.league-pill {
+  animation: slideInLeft 0.3s ease-out backwards;
+}
+
+/* Delay escalonado para cada liga */
+.league-pill:nth-child(1) { animation-delay: 0.05s; }
+.league-pill:nth-child(2) { animation-delay: 0.1s; }
+.league-pill:nth-child(3) { animation-delay: 0.15s; }
+.league-pill:nth-child(4) { animation-delay: 0.2s; }
+.league-pill:nth-child(5) { animation-delay: 0.25s; }
+.league-pill:nth-child(6) { animation-delay: 0.3s; }
+.league-pill:nth-child(7) { animation-delay: 0.35s; }
+.league-pill:nth-child(8) { animation-delay: 0.4s; }
+.league-pill:nth-child(9) { animation-delay: 0.45s; }
+.league-pill:nth-child(10) { animation-delay: 0.5s; }
+

@@ -1,0 +1,154 @@
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <h1>Estadios</h1>
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          [ngModel]="search()" 
+          (ngModelChange)="updateSearch($event)" 
+          placeholder="Buscar estadio por nombre, ciudad o equipo..." 
+          class="search-input" 
+        />
+      </div>
+    </div>
+
+    <!-- Filtros por país con organización por continente -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <span class="filters-title">🌍 Filtrar por país</span>
+        @if (selectedCountry() !== 'all') {
+          <button (click)="clearFilters()" class="clear-filters">
+            🧹 Limpiar filtros
+          </button>
+        }
+      </div>
+      
+      @for (continent of countriesByContinent(); track continent.name) {
+        <div class="continent-group">
+          <div class="continent-title">{{ continent.name }}</div>
+          <div class="country-pills">
+            <!-- Botón "Todos" al inicio de cada continente -->
+            @if (continent.name === 'Europa') {
+              <div 
+                (click)="selectCountry('all')"
+                [class.active]="selectedCountry() === 'all'"
+                class="country-pill all-countries">
+                <span class="country-flag">🌍</span>
+                <span class="country-name">Todos los países</span>
+                <span class="country-count">{{ stadiums().length }}</span>
+              </div>
+            }
+            
+            @for (country of continent.countries; track country.country) {
+              <div 
+                (click)="selectCountry(country.country)"
+                [class.active]="selectedCountry() === country.country"
+                class="country-pill">
+                <span class="country-flag">{{ country.flag }}</span>
+                <span class="country-name">{{ country.country }}</span>
+                <span class="country-count">{{ country.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      
+      @if (availableCountries().length === 0) {
+        <div class="no-countries">
+          No hay países disponibles
+        </div>
+      }
+    </div>
+
+    <!-- Stats y resultados -->
+    <div class="stadiums-stats">
+      <span>🏟️ {{ filteredStadiums().length }} estadios encontrados</span>
+      @if (selectedCountry() !== 'all') {
+        <span class="active-filter">
+          🇵🇰 {{ selectedCountry() }}
+        </span>
+      }
+    </div>
+    
+    <!-- Grid de estadios -->
+    <div class="stadiums-grid">
+      @for (s of filteredStadiums(); track s.id) {
+        <div class="stadium-card">
+          <div class="stadium-card-glow"></div>
+          
+          <div class="stadium-banner">
+            @if (s.imageUrl && s.imageUrl !== '') {
+              <img 
+                [src]="s.imageUrl" 
+                [alt]="s.name" 
+                class="stadium-image"
+                (error)="onImageError($event)"
+                loading="lazy"
+              />
+            } @else {
+              <div class="stadium-placeholder">
+                <span class="placeholder-icon">🏟️</span>
+                <span class="placeholder-text">Sin imagen</span>
+              </div>
+            }
+          </div>
+          
+          <div class="stadium-body">
+            <div class="st-name">{{ s.name }}</div>
+            <div class="st-team">
+              @if (s.team) {
+                <div class="team-info">
+                  @if (s.team.logoUrl) {
+                    <img [src]="s.team.logoUrl" class="team-logo" alt="Logo" />
+                  }
+                  <span>{{ s.team.name }}</span>
+                </div>
+              } @else {
+                <span class="no-team">Sin equipo asignado</span>
+              }
+            </div>
+            
+            <div class="st-rows">
+              @if (s.capacity) { 
+                <div class="st-row">
+                  <span>🏟️ Aforo</span>
+                  <b><strong class="text-amber-500">{{ s.capacity.toLocaleString() }}</strong> espectadores</b>
+                </div>
+              }
+              @if (s.city || s.country) { 
+                <div class="st-row">
+                  <span>📍 Ubicación</span>
+                  <b>{{ s.city }}{{ s.city && s.country ? ', ' : '' }}{{ s.country }}</b>
+                </div>
+              }
+              @if (s.inaugurated) { 
+                <div class="st-row">
+                  <span>📅 Inauguración</span>
+                  <b>{{ s.inaugurated }}</b>
+                </div>
+              }
+              @if (s.surface) { 
+                <div class="st-row">
+                  <span>🌱 Superficie</span>
+                  <b>{{ s.surface }}</b>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="empty-icon">🏟️</span>
+          <p>No se encontraron estadios</p>
+          <small>Intenta con otros filtros o términos de búsqueda</small>
+          @if (selectedCountry() !== 'all') {
+            <button (click)="clearFilters()" class="clear-filters-btn">
+              Limpiar filtros
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

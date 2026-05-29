@@ -1,0 +1,124 @@
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <h1>Equipos</h1>
+      <div class="filters">
+        <!-- Búsqueda -->
+        <div class="search-wrapper">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)"
+            placeholder="Buscar equipo..."
+            class="search-input"
+          />
+        </div>
+
+        <!-- Filtro por deporte -->
+        <div class="sport-filters">
+          @for (s of sports; track s.value) {
+            <button
+              class="sport-pill"
+              [class.active]="activeSport() === s.value"
+              (click)="activeSport.set(s.value); activeLeague.set('')">
+              {{ s.label }}
+            </button>
+          }
+        </div>
+
+        <!-- Filtro por liga (solo mostrar si hay ligas disponibles) -->
+        @if (filteredLeagues().length > 0) {
+          <div class="league-filters">
+            <button
+              class="league-pill"
+              [class.active]="activeLeague() === ''"
+              (click)="activeLeague.set('')">
+              🏆 Todas las ligas
+            </button>
+            @for (league of filteredLeagues(); track league.id) {
+              <button
+                class="league-pill"
+                [class.active]="activeLeague() === league.id"
+                (click)="activeLeague.set(league.id)">
+                @if (league.logoUrl) {
+                  <img [src]="league.logoUrl" class="league-icon" [alt]="league.name">
+                }
+                {{ league.name }}
+                <span class="league-count">({{ getTeamsCountByLeague(league.id) }})</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Mostrar filtros activos -->
+      @if (search() || activeSport() || activeLeague()) {
+        <div class="active-filters">
+          <span class="active-filters-label">Filtros activos:</span>
+          @if (search()) {
+            <span class="filter-badge">
+              🔍 {{ search() }}
+              <button (click)="search.set('')" class="remove-filter">×</button>
+            </span>
+          }
+          @if (activeSport()) {
+            <span class="filter-badge">
+              {{ sports.find(s => s.value === activeSport())?.label }}
+              <button (click)="activeSport.set('')" class="remove-filter">×</button>
+            </span>
+          }
+          @if (activeLeague()) {
+            @let league = availableLeagues().find(l => l.id === activeLeague());
+            @if (league) {
+              <span class="filter-badge">
+                🏆 {{ league.name }}
+                <button (click)="activeLeague.set('')" class="remove-filter">×</button>
+              </span>
+            }
+          }
+          <button (click)="clearFilters()" class="clear-all-btn">
+            Limpiar todo
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="loading">Cargando equipos...</div>
+    } @else {
+      <div class="teams-grid">
+        @for (team of filtered(); track team.id) {
+          <a [routerLink]="['/teams', team.slug]" class="team-card">
+            <div class="team-card-glow" [style.background]="team.primaryColor || '#3b82f6'"></div>
+            <div class="card-crest" [style.background]="(team.primaryColor || '#3b82f6') + '22'">
+              @if (team.logoUrl) {
+                <img [src]="team.logoUrl" [alt]="team.name" />
+              } @else {
+                <span>{{ team.shortName }}</span>
+              }
+            </div>
+            <div class="card-body">
+              <div class="card-name">{{ team.name }}</div>
+              <div class="card-meta">{{ team.city }}, {{ team.country }}</div>
+              <div class="card-tags">
+                @if (team.leagues?.[0]?.league) {
+                  <span class="tag">{{ team.leagues![0].league.name }}</span>
+                }
+                <span class="tag sport-tag">{{ team.leagues?.[0]?.league?.sport?.name }}</span>
+              </div>
+            </div>
+            <div class="card-arrow">→</div>
+          </a>
+        } @empty {
+          <div class="no-results">
+            No se encontraron equipos que coincidan con la búsqueda.
+            <button (click)="clearFilters()" class="clear-filters-btn">Limpiar filtros</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

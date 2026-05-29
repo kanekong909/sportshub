@@ -1,0 +1,31 @@
+/* admin-teams.component.css */
+
+/* Transiciones suaves */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Mejoras para tarjetas en móvil */
+@media (max-width: 768px) {
+  .bg-white.rounded-xl {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .bg-white.rounded-xl:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Scroll suave para el modal en móvil */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mejora para inputs en móvil */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}

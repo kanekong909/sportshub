@@ -1,0 +1,183 @@
+/* Tabs - Tus estilos existentes mejorados */
+.tab-active {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-inactive {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  background: transparent;
+  color: #6b7280;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-inactive:hover {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Animaciones para las listas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Items de búsqueda con animación */
+.flex.items-center.gap-3.p-3 {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Hover effects para cards */
+.bg-white.rounded-xl {
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.bg-white.rounded-xl:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Scrollbar personalizado (opcional) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mejora para inputs */
+input:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* Mejora para botones */
+button {
+  transition: all 0.2s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Estado de carga para el botón de transferencia */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Animación para mensajes de éxito/error */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bg-green-50, .bg-red-50 {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Estilos para la tabla responsiva */
+@media (max-width: 768px) {
+  .tab-active, .tab-inactive {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  /* Hacer tabla scrollable en móvil */
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 500px;
+  }
+}
+
+/* Mejora visual para los items seleccionados */
+.bg-blue-50 {
+  background-color: #eff6ff;
+  transition: background-color 0.15s ease;
+}
+
+/* Hover effects para filas de la tabla */
+tbody tr {
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Estilos para badges */
+span.px-2.py-0 {
+  transition: all 0.15s ease;
+}
+
+/* Mejora para los logos de equipos */
+.w-9.h-9.rounded-lg {
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Loading skeleton (opcional - para implementar después) */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

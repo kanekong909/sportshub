@@ -1,0 +1,177 @@
+@if (loading()) {
+  <div class="loading-screen">Cargando equipo...</div>
+} @else if (team(); as t) { <!-- Guardamos el valor en 't' para limpiar el HTML -->
+<div class="detail-page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-crest" [style.background]="(t.primaryColor || '#3b82f6') + '22'">
+        @if (t.logoUrl) {
+          <img [src]="t.logoUrl" [alt]="t.name" />
+        } @else {
+          <span>{{ t.shortName }}</span>
+        }
+      </div>
+      <div class="hero-info">
+        <div class="hero-league">{{ t.leagues?.[0]?.league?.name }} · {{ t.country }}</div>
+        <h1>{{ t.name }}</h1>
+        <div class="hero-meta">
+        @if (t.foundedYear) {
+          <span class="meta-item">
+            <img src="icons/foundation.svg" alt="Fundación">
+            Fundado {{ t.foundedYear }}
+          </span>
+        }
+        @if (t.city) {
+          <span class="meta-item">
+            <img src="icons/location.svg" alt="Ciudad">
+            {{ t.city }}
+          </span>
+        }
+        @if (t.stadium) {
+          <span class="meta-item">
+            <img src="icons/stadium.svg" alt="Estadio">
+            {{ t.stadium.name }}
+          </span>
+        }
+        </div>
+      </div>
+      <button class="btn-fav" [class.active]="isFavorite()" (click)="toggleFavorite()">
+        {{ isFavorite() ? '❤️ Siguiendo' : '🤍 Seguir' }}
+      </button>
+    </div>
+
+    <!-- Totales de títulos (Llamada al signal computado) -->
+    <div class="hero-stats">
+      @for (stat of heroStats(); track stat.label) {
+        <div class="hstat">
+          <div class="hstat-val">{{ stat.value }}</div>
+          <div class="hstat-lbl">{{ stat.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- SUB NAV -->
+  <div class="subnav">
+    @for (tab of tabs; track tab.key) {
+      <button class="snav" [class.active]="activeTab() === tab.key" (click)="activeTab.set(tab.key)">
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <div class="content">
+
+    <!-- PLANTILLA -->
+    @if (activeTab() === 'squad') {
+      <div class="card">
+        <h2 class="card-title">Plantilla</h2>
+        <div class="squad-grid">
+          @for (player of t.players || []; track player.id) {
+            <a [routerLink]="['/players', player.slug]" class="squad-card">
+              <div class="team-card-glow" [style.background]="t.primaryColor || '#3b82f6'"></div>
+              <div class="sq-photo" [style.background]="(t.primaryColor || '#3b82f6') + '18'">
+                @if (player.photoUrl) {
+                  <img [src]="player.photoUrl" [alt]="player.firstName" />
+                } @else {
+                  <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                }
+              </div>
+              <div class="sq-num">#{{ player.jerseyNumber }}</div>
+              <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+              <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- HISTORIA -->
+    @if (activeTab() === 'history') {
+      <div class="card">
+        <h2 class="card-title">Historia del club</h2>
+        @if (t.description) {
+          <p class="description">{{ t.description }}</p>
+        }
+        <div class="timeline">
+          @for (h of t.history || []; track h.id) {
+            <div class="tl-item">
+              <div class="tl-year">{{ h.year }}</div>
+              <div class="tl-dot"></div>
+              <div class="tl-text">{{ h.event }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ESTADÍSTICAS -->
+    @if (activeTab() === 'stats') {
+      <div class="card">
+        <h2 class="card-title">Rendimiento por temporada</h2>
+        <div class="table-responsive">
+          <table class="stats-table">
+            <thead>
+              <tr><th>Temporada</th><th>Liga</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>Pts</th><th>Pos.</th></tr>
+            </thead>
+            <tbody>
+              @for (s of t.seasonStats || []; track s.id) {
+                <tr>
+                  <td>{{ s.season }}</td>
+                  <td>{{ s.league.name }}</td>
+                  <td>{{ s.played }}</td>
+                  <td>{{ s.won }}</td>
+                  <td>{{ s.drawn }}</td>
+                  <td>{{ s.lost }}</td>
+                  <td>{{ s.goalsFor }}</td>
+                  <td>{{ s.goalsAgainst }}</td>
+                  <td><b>{{ s.points }}</b></td>
+                  <td>{{ s.position }}°</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ESTADIO -->
+    @if (activeTab() === 'stadium' && t.stadium) {
+      <div class="card">
+        <h2 class="card-title">{{ t.stadium.name }}</h2>
+        <div class="stadium-info">
+          <div class="si-row"><span>Capacidad</span><b>{{ t.stadium.capacity?.toLocaleString() }}</b></div>
+          <div class="si-row"><span>Ciudad</span><b>{{ t.stadium.city }}</b></div>
+          <div class="si-row"><span>País</span><b>{{ t.stadium.country }}</b></div>
+          <div class="si-row"><span>Inaugurado</span><b>{{ t.stadium.inaugurated }}</b></div>
+          @if (t.stadium.lastRenovated) {
+            <div class="si-row"><span>Última reforma</span><b>{{ t.stadium.lastRenovated }}</b></div>
+          }
+          <div class="si-row"><span>Superficie</span><b>{{ t.stadium.surface }}</b></div>
+        </div>
+      </div>
+    }
+
+    <!-- PALMARÉS -->
+    @if (activeTab() === 'titles') {
+      <div class="card">
+        <h2 class="card-title">Palmarés</h2>
+        <div class="titles-grid">
+          @for (title of groupedTitles(); track title.name) {
+            <div class="title-chip">
+              <span class="title-icon">🏆</span>
+              <div>
+                <div class="title-name">{{ title.name }}</div>
+                <div class="title-count">×{{ title.count }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+}

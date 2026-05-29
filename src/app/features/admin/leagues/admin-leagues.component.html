@@ -1,0 +1,221 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Ligas</h1>
+    <button (click)="openCreate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">+ Nueva liga</button>
+  </div>
+
+  <!-- TABLA PRINCIPAL -->
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Logo</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deporte</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">País</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Temporada</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Equipos</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (l of leagues(); track l.id) {
+          <tr class="hover:bg-gray-50/80 transition-colors">
+            <td class="px-4 py-3">
+              <div class="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                @if (l.logoUrl) {
+                  <img [src]="l.logoUrl" [alt]="l.name" class="w-full h-full object-contain" />
+                } @else {
+                  <span class="text-xs font-bold text-gray-400">{{ l.name.charAt(0) }}</span>
+                }
+              </div>
+            </td>
+            <td class="px-4 py-3 font-medium text-gray-900">{{ l.name }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ l.sport?.name }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ l.country || '—' }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ l.season || '—' }}</td>
+            <td class="px-4 py-3 text-gray-500">
+              <span class="px-2 py-1 bg-gray-100 rounded-md font-mono text-xs">{{ l._count?.teams || 0 }}</span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2">
+                <button (click)="openEdit(l)" class="text-blue-600 hover:text-blue-800 text-xs font-medium transition">Editar</button>
+                <button (click)="openImage(l)" class="text-green-600 hover:text-green-800 text-xs font-medium transition">Imagen</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO -->
+@if (showForm()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0">
+        <h2 class="text-lg font-semibold text-gray-900">{{ editing() ? 'Editar liga' : 'Nueva liga' }}</h2>
+        <button (click)="showForm.set(false)" class="text-gray-400 hover:text-gray-600 text-2xl transition">×</button>
+      </div>
+      
+      <!-- Cuerpo del formulario con Scroll interno -->
+      <div class="p-6 flex flex-col gap-4 overflow-y-auto">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Nombre *</label>
+          <input [(ngModel)]="form.name" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+        </div>
+        
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Deporte *</label>
+          <select [(ngModel)]="form.sportId" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500">
+            <option value="">Seleccionar...</option>
+            @for (s of sports(); track s.id) {
+              <option [value]="s.id">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">País</label>
+          <input [(ngModel)]="form.country" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+        </div>
+        
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Temporada</label>
+          <input [(ngModel)]="form.season" placeholder="2024-25" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+        </div>
+
+        <!-- URL del Logo -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">URL del Logo</label>
+          <input [(ngModel)]="form.logoUrl" placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+          @if (form.logoUrl) {
+            <div class="mt-2 flex items-center gap-2">
+              <img [src]="form.logoUrl" alt="Preview" class="w-8 h-8 object-contain rounded border" />
+              <span class="text-xs text-gray-500">Vista previa</span>
+            </div>
+          }
+        </div>
+
+        <!-- SECCIÓN CON BUSCADOR DE EQUIPOS INTEGRADO -->
+        <div class="border-t border-gray-100 pt-4">
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider">Equipos de la liga</label>
+            <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+              {{ form.teamIds?.length || 0 }} seleccionados
+            </span>
+          </div>
+
+          <!-- INPUT DEL BUSCADOR -->
+          <div class="relative mb-2">
+            <input 
+              [ngModel]="teamSearch()" 
+              (ngModelChange)="teamSearch.set($event)"
+              type="text" 
+              placeholder="Filtrar equipos por nombre o ciudad..." 
+              class="w-full pl-3 pr-8 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
+            />
+            @if (teamSearch()) {
+              <button (click)="teamSearch.set('')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">×</button>
+            }
+          </div>
+
+          <!-- CONTENEDOR CON LA LISTA FILTRADA -->
+          <div class="border border-gray-200 rounded-xl p-2 max-h-48 overflow-y-auto bg-gray-50 flex flex-col gap-1.5">
+            @for (team of filteredTeams(); track team.id) {
+              <div 
+                (click)="toggleTeamSelection(team.id)"
+                [class.bg-blue-50]="isTeamSelected(team.id)"
+                [class.border-blue-200]="isTeamSelected(team.id)"
+                class="flex items-center gap-3 px-3 py-2 bg-white border border-gray-100 rounded-lg cursor-pointer hover:border-blue-300 transition-all text-sm select-none"
+              >
+                <div 
+                  [class.bg-blue-600]="isTeamSelected(team.id)"
+                  [class.border-blue-600]="isTeamSelected(team.id)"
+                  class="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center transition-colors text-white font-bold text-xs shrink-0"
+                >
+                  @if (isTeamSelected(team.id)) { ✓ }
+                </div>
+
+                @if (team.logoUrl) {
+                  <img [src]="team.logoUrl" class="w-5 h-5 object-contain shrink-0" alt="Logo" />
+                }
+                <span class="text-gray-700 font-medium truncate" [class.text-blue-900]="isTeamSelected(team.id)">{{ team.name }}</span>
+                <span class="text-xs text-gray-400 ml-auto shrink-0">{{ team.city }}</span>
+              </div>
+            } @empty {
+              <div class="text-xs text-gray-400 text-center py-6">
+                {{ allTeams().length === 0 ? 'No hay equipos creados todavía' : 'No se encontraron equipos' }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 sticky bottom-0">
+        <button (click)="showForm.set(false)" class="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
+        <button (click)="save()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-sm transition">{{ editing() ? 'Guardar' : 'Crear' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL DE IMAGEN -->
+@if (showImageModal()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Logo — {{ selectedLeague()?.name }}</h2>
+        <button (click)="showImageModal.set(false)" class="text-gray-400 hover:text-gray-600 text-2xl leading-none transition">×</button>
+      </div>
+      
+      <div class="p-6">
+        <!-- Vista previa del logo actual -->
+        @if (selectedLeague()?.logoUrl) {
+          <div class="flex justify-center mb-4">
+            <img [src]="selectedLeague()!.logoUrl" alt="logo" class="w-24 h-24 object-contain rounded-lg border border-gray-100 p-2" />
+          </div>
+        }
+
+        <!-- Opción 1: URL -->
+        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">URL de imagen</label>
+        <div class="flex gap-2 mb-4">
+          <input [(ngModel)]="imageUrl" placeholder="https://..."
+            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+          <button (click)="saveImageUrl()" 
+            class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+            Guardar URL
+          </button>
+        </div>
+
+        <!-- Opción 2: Subir archivo -->
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">O subir archivo</label>
+          
+          <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+            <span class="text-3xl mb-1">📁</span>
+            <span class="text-xs text-gray-500">Click para seleccionar imagen</span>
+            <span class="text-xs text-gray-400">PNG, JPG, SVG hasta 5MB</span>
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+          </label>
+          
+          @if (selectedFile()) {
+            <div class="mt-3 flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">📄</span>
+                <span class="text-xs text-gray-600 truncate flex-1">{{ selectedFile()!.name }}</span>
+                <span class="text-xs text-gray-400">{{ (selectedFile()!.size / 1024).toFixed(0) }} KB</span>
+              </div>
+              <button (click)="uploadFile()" 
+                [disabled]="uploading()"
+                class="ml-2 px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ uploading() ? 'Subiendo...' : 'Subir' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

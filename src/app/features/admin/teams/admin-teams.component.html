@@ -1,0 +1,325 @@
+<div class="p-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Equipos</h1>
+      <p class="text-gray-500 text-sm mt-1">{{ filteredTeams().length }} equipos en total</p>
+    </div>
+    <button (click)="openCreate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+      + Nuevo equipo
+    </button>
+  </div>
+
+  <!-- Barra de filtros -->
+  <div class="mb-6 space-y-4">
+    <!-- Búsqueda -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <div class="flex-1 min-w-[200px]">
+        <div class="relative">
+          <input [(ngModel)]="search" placeholder="Buscar equipo por nombre, ciudad o país..."
+            class="w-full px-3 py-2 pl-9 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          <span class="absolute left-3 top-2.5 text-gray-400">🔍</span>
+        </div>
+      </div>
+
+      <button (click)="clearFilters()"
+        class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+        🧹 Limpiar filtros
+      </button>
+    </div>
+
+    <!-- Filtros por deporte (dinámicos desde los equipos cargados) -->
+    @if (availableSports().length > 0) {
+      <div>
+        <label class="text-xs font-medium text-gray-600 mb-2 block">Filtrar por deporte:</label>
+        <div class="flex flex-wrap gap-2">
+          <button (click)="selectedSport.set('all')"
+            [class.bg-blue-600]="selectedSport() === 'all'"
+            [class.text-white]="selectedSport() === 'all'"
+            [class.bg-gray-100]="selectedSport() !== 'all'"
+            [class.text-gray-700]="selectedSport() !== 'all'"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:scale-105">
+            🏆 Todos
+            <span class="ml-1 text-xs opacity-75">({{ getTeamsCountBySport('all') }})</span>
+          </button>
+
+          @for (sport of availableSports(); track sport.id) {
+            <button (click)="selectedSport.set(sport.id)"
+              [class.bg-blue-600]="selectedSport() === sport.id"
+              [class.text-white]="selectedSport() === sport.id"
+              [class.bg-gray-100]="selectedSport() !== sport.id"
+              [class.text-gray-700]="selectedSport() !== sport.id"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:scale-105">
+              {{ sport.icon }} {{ sport.name }}
+              <span class="ml-1 text-xs opacity-75">({{ getTeamsCountBySport(sport.id) }})</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Filtros por liga -->
+    @if (getFilteredLeagues().length > 0) {
+      <div>
+        <label class="text-xs font-medium text-gray-600 mb-2 block">Filtrar por liga:</label>
+        <div class="flex flex-wrap gap-2">
+          <button (click)="selectedLeague.set('all')"
+            [class.bg-blue-600]="selectedLeague() === 'all'"
+            [class.text-white]="selectedLeague() === 'all'"
+            [class.bg-gray-100]="selectedLeague() !== 'all'"
+            [class.text-gray-700]="selectedLeague() !== 'all'"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:scale-105">
+            🏆 Todas
+            <span class="ml-1 text-xs opacity-75">({{ getTeamsCountByLeague('all') }})</span>
+          </button>
+
+          @for (league of getFilteredLeagues(); track league.id) {
+            <button (click)="selectedLeague.set(league.id)"
+              [class.bg-blue-600]="selectedLeague() === league.id"
+              [class.text-white]="selectedLeague() === league.id"
+              [class.bg-gray-100]="selectedLeague() !== league.id"
+              [class.text-gray-700]="selectedLeague() !== league.id"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:scale-105">
+              @if (league.logoUrl) {
+                <img [src]="league.logoUrl" class="w-4 h-4 inline object-contain" />
+              } @else {
+                {{ league.sportIcon }}
+              }
+              {{ league.name }}
+              <span class="ml-1 text-xs opacity-75">({{ getTeamsCountByLeague(league.id) }})</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Mostrar filtros activos -->
+  @if (search() || (selectedSport() && selectedSport() !== 'all')) {
+    <div class="mb-4 flex flex-wrap gap-2">
+      <span class="text-xs text-gray-500">Filtros activos:</span>
+      @if (search()) {
+        <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs">
+          🔍 {{ search() }}
+          <button (click)="search.set('')" class="hover:text-blue-900">×</button>
+        </span>
+      }
+      @if (selectedSport() && selectedSport() !== 'all') {
+        @let sport = availableSports().find(s => s.id === selectedSport());
+        @if (sport) {
+          <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs">
+            {{ sport.icon }} {{ sport.name }}
+            <button (click)="selectedSport.set('all')" class="hover:text-green-900">×</button>
+          </span>
+        }
+      }
+    </div>
+  }
+
+  <!-- Tabla de equipos -->
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Logo</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deporte</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Liga</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">País</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jugadores</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        @if (filteredTeams().length === 0) {
+          <tr>
+            <td colspan="8" class="px-4 py-12 text-center text-gray-500">
+              <div class="flex flex-col items-center gap-2">
+                <span class="text-4xl">🔍</span>
+                <p>No se encontraron equipos</p>
+                <button (click)="clearFilters()" class="text-blue-600 hover:text-blue-700 text-sm">
+                  Limpiar filtros
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (team of filteredTeams(); track team.id) {
+            @let sport = getTeamSport(team);
+            <tr class="hover:bg-gray-50 transition-colors">
+              <!-- LOGO -->
+              <td class="px-4 py-3">
+                <div class="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                  @if (team.logoUrl) {
+                    <img [src]="team.logoUrl" [alt]="team.name" class="w-full h-full object-contain" />
+                  } @else {
+                    <span class="text-xs font-bold text-gray-400">{{ team.shortName }}</span>
+                  }
+                </div>
+              </td>
+
+              <!-- NOMBRE EQUIPO -->
+              <td class="px-4 py-3 font-medium text-gray-900">{{ team.name }}</td>
+
+              <!-- DEPORTE -->
+              <td class="px-4 py-3">
+                @if (sport) {
+                  <span class="inline-flex items-center gap-1">
+                    {{ getSportIconByName(sport.name) }}
+                    <span class="text-gray-600">{{ sport.name }}</span>
+                  </span>
+                } @else {
+                  <span class="text-gray-400">—</span>
+                }
+              </td>
+
+              <!-- LIGAS -->
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1">
+                  @for (teamLeague of team.leagues; track teamLeague.league.id) {
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                      @if (teamLeague.league.logoUrl) {
+                        <img [src]="teamLeague.league.logoUrl"
+                            [alt]="teamLeague.league.name"
+                            class="w-3 h-3 object-contain">
+                      }
+                      {{ teamLeague.league.name }}
+                    </span>
+                  }
+                  @if (!team.leagues || team.leagues.length === 0) {
+                    <span class="text-gray-400">—</span>
+                  }
+                </div>
+              </td>
+
+              <!-- CIUDAD -->
+              <td class="px-4 py-3 text-gray-500">{{ team.city || '—' }}</td>
+
+              <!-- PAÍS -->
+              <td class="px-4 py-3 text-gray-500">{{ team.country || '—' }}</td>
+
+              <!-- JUGADORES -->
+              <td class="px-4 py-3 text-gray-500">{{ team._count?.players || 0 }}</td>
+
+              <!-- ACCIONES -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <button (click)="openEdit(team)" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Editar</button>
+                  <button (click)="openImage(team)" class="text-green-600 hover:text-green-800 text-xs font-medium">Imagen</button>
+                  <button (click)="confirmDelete(team)" class="text-red-500 hover:text-red-700 text-xs font-medium">Borrar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de formulario -->
+@if (showForm()) {
+  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+        <h2 class="text-lg font-semibold text-gray-900">{{ editing() ? 'Editar equipo' : 'Nuevo equipo' }}</h2>
+        <button (click)="showForm.set(false)" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+      </div>
+      <div class="p-6 grid grid-cols-2 gap-4">
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+          <input [(ngModel)]="form.name"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Nombre corto</label>
+          <input [(ngModel)]="form.shortName"
+            placeholder="RM, LAL..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">País</label>
+          <input [(ngModel)]="form.country"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Ciudad</label>
+          <input [(ngModel)]="form.city"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Año de fundación</label>
+          <input [(ngModel)]="form.foundedYear"
+            type="number" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Color principal</label>
+          <input [(ngModel)]="form.primaryColor"
+            type="color" class="w-full h-9 px-1 py-1 border border-gray-200 rounded-lg cursor-pointer" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Color secundario</label>
+          <input [(ngModel)]="form.secondaryColor"
+            type="color" class="w-full h-9 px-1 py-1 border border-gray-200 rounded-lg cursor-pointer" />
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">URL del logo</label>
+          <input [(ngModel)]="form.logoUrl"
+            placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
+          <textarea [(ngModel)]="form.description"
+            rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 sticky bottom-0 bg-white">
+        <button (click)="showForm.set(false)" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Cancelar</button>
+        <button (click)="save()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+          {{ editing() ? 'Guardar cambios' : 'Crear equipo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de imagen -->
+@if (showImageModal()) {
+  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Logo — {{ selectedTeam()?.name }}</h2>
+        <button (click)="showImageModal.set(false)" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+      </div>
+      <div class="p-6">
+        @if (selectedTeam()?.logoUrl) {
+          <div class="flex justify-center mb-4">
+            <img [src]="selectedTeam()!.logoUrl" alt="logo" class="w-20 h-20 object-contain rounded-lg border border-gray-100" />
+          </div>
+        }
+        <label class="block text-xs font-medium text-gray-600 mb-1">URL de imagen</label>
+        <div class="flex gap-2 mb-4">
+          <input [(ngModel)]="imageUrl" placeholder="https://..."
+            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          <button (click)="saveImageUrl()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Guardar URL</button>
+        </div>
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-medium text-gray-600 mb-2">O subir archivo</label>
+          <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+            <span class="text-2xl mb-1">📁</span>
+            <span class="text-xs text-gray-500">Click para seleccionar imagen</span>
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+          </label>
+          @if (selectedFile()) {
+            <div class="mt-3 flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+              <span class="text-xs text-gray-600 truncate">{{ selectedFile()!.name }}</span>
+              <button (click)="uploadFile()" class="ml-2 px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700 flex-shrink-0">
+                {{ uploading() ? 'Subiendo...' : 'Subir' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

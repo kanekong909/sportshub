@@ -1,0 +1,199 @@
+<div class="home-page">
+
+      <!-- GREETING -->
+      <div class="greeting-section">
+        <div class="greeting-content">
+          <h1 class="greeting-title">
+            Bienvenido,<br>
+            <span class="gradient-text">{{ auth.currentUser()?.name }}</span>
+          </h1>
+          <p class="greeting-sub">Tu enciclopedia deportiva personalizada</p>
+        </div>
+        <div class="stats-row">
+          <div class="stat-glass">
+            <div class="stat-val">{{ favoriteTeams().length }}</div>
+            <div class="stat-lbl">Equipos</div>
+          </div>
+          <div class="stat-glass">
+            <div class="stat-val">{{ followedPlayers().length }}</div>
+            <div class="stat-lbl">Jugadores</div>
+          </div>
+          <div class="stat-glass">
+            <div class="stat-val">{{ notes().length }}</div>
+            <div class="stat-lbl">Notas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIS EQUIPOS -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">Mis equipos</h2>
+          <a routerLink="/teams" class="section-link">Ver todos →</a>
+        </div>
+        @if (favoriteTeams().length === 0) {
+          <div class="empty-card">
+            <div class="empty-icon">🛡️</div>
+            <p>Todavía no sigues ningún equipo</p>
+            <a routerLink="/teams" class="btn-primary">Explorar equipos</a>
+          </div>
+        } @else {
+          <div class="teams-grid">
+            @for (ft of favoriteTeams(); track ft.team.id) {
+              <a [routerLink]="['/teams', ft.team.slug]" class="team-glass-card">
+                <div class="team-card-glow" [style.background]="ft.team.primaryColor || '#3b82f6'"></div>
+                <div class="team-card-inner">
+                  <div class="team-crest" [style.background]="(ft.team.primaryColor || '#3b82f6') + '33'">
+                    @if (ft.team.logoUrl) {
+                      <img [src]="ft.team.logoUrl" [alt]="ft.team.name" />
+                    } @else {
+                      <span>{{ ft.team.shortName }}</span>
+                    }
+                  </div>
+                  <div class="team-card-name">{{ ft.team.name }}</div>
+                  <div class="team-card-league">{{ ft.team.leagues?.[0]?.league?.name }}</div>
+                  <span class="sport-chip">{{ ft.team.leagues?.[0]?.league?.sport?.name }}</span>
+                </div>
+              </a>
+            }
+            <a routerLink="/teams" class="team-glass-card team-add-card">
+              <div class="add-icon">＋</div>
+              <span>Añadir equipo</span>
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- DOS COLUMNAS: Jugadores + Notas -->
+      <div class="two-col-section">
+
+        <!-- MIS JUGADORES -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Jugadores seguidos</h2>
+            <a routerLink="/players" class="section-link">Ver todos →</a>
+          </div>
+          @if (followedPlayers().length === 0) {
+            <div class="empty-card-sm">
+              <span class="empty-icon-sm">👤</span>
+              <p>No sigues jugadores aún</p>
+              <a routerLink="/players" class="link-sm">Explorar →</a>
+            </div>
+          } @else {
+            <div class="players-list">
+              @for (fp of followedPlayers().slice(0, 5); track fp.player.id) {
+                <a [routerLink]="['/players', fp.player.slug]" class="player-row-card">
+                  <div class="player-avatar">
+                    @if (fp.player.photoUrl) {
+                      <img [src]="fp.player.photoUrl" [alt]="fp.player.firstName" />
+                    } @else {
+                      <span>{{ fp.player.firstName[0] }}{{ fp.player.lastName[0] }}</span>
+                    }
+                  </div>
+                  <div class="player-info">
+                    <div class="player-name">{{ fp.player.firstName }} {{ fp.player.lastName }}</div>
+                    <div class="player-meta">{{ fp.player.team?.name }} · {{ fp.player.position?.code }}</div>
+                  </div>
+                  <span class="row-arrow">→</span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- MIS NOTAS -->
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Mis notas</h2>
+          </div>
+          @if (notes().length === 0) {
+            <div class="empty-card-sm">
+              <span class="empty-icon-sm">📝</span>
+              <p>No tienes notas guardadas</p>
+              <span class="link-sm-muted">Visita un equipo o jugador para añadir</span>
+            </div>
+          } @else {
+            <div class="notes-list">
+              @for (note of notes().slice(0, 4); track note.id) {
+                <div class="note-card">
+                  <div class="note-type-badge">
+                    {{ note.entityType === 'team' ? '🛡️' : note.entityType === 'player' ? '👤' : '🏟️' }}
+                  </div>
+                  <div class="note-body">
+                    <div class="note-text">{{ note.content }}</div>
+                    <div class="note-date">{{ note.updatedAt | date:'d MMM y' }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- HISTORIAL RECIENTE -->
+      @if (history().length > 0) {
+        <div class="section">
+          <div class="section-header">
+            <h2 class="section-title">Visto recientemente</h2>
+          </div>
+          <div class="history-row">
+            @for (item of history().slice(0, 6); track item.id) {
+              <a [routerLink]="item.entityType === 'team' ? ['/teams', item.team?.slug] : ['/players', item.player?.slug]"
+                class="history-chip">
+                @if (item.entityType === 'team') {
+                  <!-- Logo del equipo -->
+                  @if (item.team?.logoUrl) {
+                    <img [src]="item.team.logoUrl" [alt]="item.team.name" class="history-icon-img">
+                  } @else {
+                    <span class="history-icon">🛡️</span>
+                  }
+                  <span>{{ item.team?.name }}</span>
+                } @else {
+                  <!-- Foto del jugador -->
+                  @if (item.player?.photoUrl) {
+                    <img [src]="item.player.photoUrl" [alt]="item.player.firstName + ' ' + item.player.lastName" 
+                        class="history-icon-img">
+                  } @else {
+                    <span class="history-icon">👤</span>
+                  }
+                  <span>{{ item.player?.firstName }} {{ item.player?.lastName }}</span>
+                }
+              </a>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- EXPLORAR -->
+      <div class="section">
+        <h2 class="section-title" style="margin-bottom:14px">Explorar</h2>
+        <div class="explore-grid">
+          <a routerLink="/teams" class="explore-glass">
+            <div class="explore-icon-wrap" style="background:rgba(59,130,246,0.2)">🛡️</div>
+            <div>
+              <div class="explore-label">Equipos</div>
+              <div class="explore-sub">Soccer · NBA · NFL</div>
+            </div>
+            <span class="explore-arrow">→</span>
+          </a>
+          <a routerLink="/players" class="explore-glass">
+            <div class="explore-icon-wrap" style="background:rgba(16,185,129,0.2)">👤</div>
+            <div>
+              <div class="explore-label">Jugadores</div>
+              <div class="explore-sub">Perfiles y stats</div>
+            </div>
+            <span class="explore-arrow">→</span>
+          </a>
+          <a routerLink="/stadiums" class="explore-glass">
+            <div class="explore-icon-wrap" style="background:rgba(245,158,11,0.2)">🏟️</div>
+            <div>
+              <div class="explore-label">Estadios</div>
+              <div class="explore-sub">Historia y datos</div>
+            </div>
+            <span class="explore-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+    </div>

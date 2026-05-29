@@ -1,0 +1,223 @@
+@if (loading()) {
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <span>Cargando jugador...</span>
+  </div>
+} @else if (player()) {
+  <div class="player-page">
+
+    <!-- HERO FULL WIDTH -->
+    <div class="hero-section">
+
+      <!-- Fondo con color del equipo o foto difuminada -->
+      <div class="hero-bg">
+        @if (player()!.photoUrl) {
+          <img [src]="player()!.photoUrl" class="hero-bg-img" alt="" />
+        }
+        <div class="hero-bg-overlay"></div>
+      </div>
+
+      <div class="hero-content">
+        <!-- Foto grande -->
+        <div class="hero-photo-wrap">
+          <div class="hero-photo">
+            @if (player()!.photoUrl) {
+              <img [src]="player()!.photoUrl" [alt]="player()!.firstName" />
+            } @else {
+              <span class="hero-initials">
+                {{ player()!.firstName[0] }}{{ player()!.lastName[0] }}
+              </span>
+            }
+          </div>
+          <div class="jersey-badge">#{{ player()!.jerseyNumber || '—' }}</div>
+        </div>
+
+        <!-- Info -->
+        <div class="hero-info">
+          <div class="hero-tags">
+            @if (player()!.position) {
+              <span class="pos-tag pos-{{ player()!.position!.code.toLowerCase() }}">
+                {{ player()!.position!.name }}
+              </span>
+            }
+            @if (player()!.team) {
+              <a [routerLink]="['/teams', player()!.team!.slug]" class="team-tag">
+                {{ player()!.team!.name }} ↗
+              </a>
+            }
+          </div>
+
+          <h1 class="hero-name">
+            <span class="hero-firstname">{{ player()!.firstName }}</span>
+            <span class="hero-lastname">{{ player()!.lastName }}</span>
+          </h1>
+
+          <div class="hero-stats-row">
+            @if (player()!.nationality) {
+              <div class="hero-stat">
+                <span class="hs-icon">🌍</span>
+                <span>{{ player()!.nationality }}</span>
+              </div>
+            }
+            @if (player()!.height) {
+              <div class="hero-stat">
+                <span class="hs-icon">📏</span>
+                <span>{{ player()!.height }} cm</span>
+              </div>
+            }
+            @if (player()!.weight) {
+              <div class="hero-stat">
+                <span class="hs-icon">⚖️</span>
+                <span>{{ player()!.weight }} kg</span>
+              </div>
+            }
+          </div>
+
+          <button class="btn-follow" [class.active]="isFollowing()" (click)="toggleFollow()">
+            @if (isFollowing()) {
+              <span>⭐</span> Siguiendo
+            } @else {
+              <span>☆</span> Seguir jugador
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+      <!-- Datos rápidos en chips -->
+      <div class="quick-chips">
+        @if (player()!.jerseyNumber) {
+          <div class="quick-chip"><span class="qc-label">Camiseta</span><span class="qc-val">#{{ player()!.jerseyNumber }}</span></div>
+        }
+        @if (player()!.position) {
+          <div class="quick-chip"><span class="qc-label">Posición</span><span class="qc-val">{{ player()!.position!.code }}</span></div>
+        }
+        @if (player()!.height) {
+          <div class="quick-chip"><span class="qc-label">Altura</span><span class="qc-val">{{ player()!.height }} cm</span></div>
+        }
+        @if (player()!.weight) {
+          <div class="quick-chip"><span class="qc-label">Peso</span><span class="qc-val">{{ player()!.weight }} kg</span></div>
+        }
+        @if (player()!.nationality) {
+          <div class="quick-chip"><span class="qc-label">País</span><span class="qc-val">{{ player()!.nationality }}</span></div>
+        }
+      </div>
+
+      <div class="content-grid">
+        <div class="content-main">
+
+          <!-- Biografía -->
+          @if (player()!.biography) {
+            <div class="glass-card">
+              <h2 class="card-title">Biografía</h2>
+              <p class="bio-text">{{ player()!.biography }}</p>
+            </div>
+          }
+
+          <!-- Stats por temporada -->
+          @if (player()!.seasonStats?.length) {
+            <div class="glass-card">
+              <h2 class="card-title">Estadísticas por temporada</h2>
+              @for (s of player()!.seasonStats; track s.id) {
+                <div class="season-block">
+                  <div class="season-label">
+                    <span class="season-year">{{ s.season }}</span>
+                    <span class="season-league">{{ s.league.name }}</span>
+                  </div>
+                  <div class="stats-chips-grid">
+                    @for (entry of objectEntries(s.stats); track entry[0]) {
+                      <div class="stat-chip-card">
+                        <div class="sc-val">{{ entry[1] }}</div>
+                        <div class="sc-lbl">{{ entry[0] }}</div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+
+        <div class="content-side">
+
+          <!-- Datos personales -->
+          <div class="glass-card">
+            <h2 class="card-title">Datos personales</h2>
+            <div class="info-list">
+              @if (player()!.birthDate) {
+                <div class="info-item">
+                  <span class="info-key">Nacimiento</span>
+                  <span class="info-val">{{ player()!.birthDate | date:'d MMM y' }}</span>
+                </div>
+              }
+              @if (player()!.birthPlace) {
+                <div class="info-item">
+                  <span class="info-key">Lugar</span>
+                  <span class="info-val">{{ player()!.birthPlace }}</span>
+                </div>
+              }
+              @if (player()!.nationality) {
+                <div class="info-item">
+                  <span class="info-key">Nacionalidad</span>
+                  <span class="info-val">{{ player()!.nationality }}</span>
+                </div>
+              }
+              @if (player()!.height) {
+                <div class="info-item">
+                  <span class="info-key">Altura</span>
+                  <span class="info-val">{{ player()!.height }} cm</span>
+                </div>
+              }
+              @if (player()!.weight) {
+                <div class="info-item">
+                  <span class="info-key">Peso</span>
+                  <span class="info-val">{{ player()!.weight }} kg</span>
+                </div>
+              }
+              @if (player()!.position?.sport) {
+                <div class="info-item">
+                  <span class="info-key">Deporte</span>
+                  <span class="info-val">{{ player()!.position!.sport.name }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Equipo actual -->
+          @if (player()!.team) {
+            <a [routerLink]="['/teams', player()!.team!.slug]" class="team-card-link">
+              <div class="glass-card team-card-inner">
+                <h2 class="card-title">Equipo actual</h2>
+                <div class="team-info-row">
+                  <div class="team-logo-sm">
+                    @if (player()!.team!.logoUrl) {
+                      <img [src]="player()!.team!.logoUrl" [alt]="player()!.team!.name" />
+                    } @else {
+                      <span>{{ player()!.team!.name[0] }}</span>
+                    }
+                  </div>
+                  <div>
+                    <div class="team-name-sm">{{ player()!.team!.name }}</div>
+                    <div class="team-link-hint">Ver perfil completo →</div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          }
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+} @else {
+  <div class="not-found">
+    <h2>Jugador no encontrado</h2>
+    <p>Lo sentimos, no pudimos encontrar el jugador que buscas.</p>
+    <a routerLink="/players" class="btn">Volver a la lista de jugadores</a>
+  </div>
+}

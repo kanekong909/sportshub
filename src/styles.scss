@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "primeicons/primeicons.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { height: 100%; }
+
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(ellipse at 10% 10%, rgba(99,102,241,0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 90% 5%,  rgba(59,130,246,0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 95%, rgba(139,92,246,0.12) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: #f1f5f9;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Fix inputs en admin panel */
+.p-8 input:not([type="color"]),
+.p-8 textarea,
+.p-8 select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+/* Fix modales */
+.bg-white input:not([type="color"]),
+.bg-white textarea,
+.bg-white select {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}

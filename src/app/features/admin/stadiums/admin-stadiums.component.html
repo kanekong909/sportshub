@@ -1,0 +1,250 @@
+<!-- admin-stadiums.component.html -->
+<div class="p-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Estadios</h1>
+      <p class="text-gray-500 text-sm mt-1">{{ stadiums().length }} estadios en total</p>
+    </div>
+    <button (click)="openCreate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+      + Nuevo estadio
+    </button>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Imagen</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Equipo</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ciudad</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">País</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aforo</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        @for (s of stadiums(); track s.id) {
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3">
+              <div class="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center stadium-image-preview">
+                @if (s.imageUrl && s.imageUrl !== '') {
+                  <img 
+                    [src]="s.imageUrl" 
+                    [alt]="s.name" 
+                    class="w-full h-full object-cover"
+                    (error)="s.imageUrl = ''"
+                  />
+                } @else {
+                  <span class="text-xs font-bold text-gray-400">🏟️</span>
+                }
+              </div>
+            </td>
+            <td class="px-4 py-3 font-medium text-gray-900">{{ s.name }}</td>
+            <td class="px-4 py-3">
+              @if (s.team) {
+                <div class="flex items-center gap-2">
+                  @if (s.team.logoUrl) {
+                    <img [src]="s.team.logoUrl" class="w-5 h-5 object-contain" />
+                  }
+                  <span class="text-gray-600">{{ s.team.name }}</span>
+                </div>
+              } @else {
+                <span class="text-gray-400 italic">Sin equipo asignado</span>
+              }
+            </td>
+            <td class="px-4 py-3 text-gray-500">{{ s.city || '—' }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ s.country || '—' }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ s.capacity?.toLocaleString() || '—' }}</td>
+            <td class="px-4 py-3">
+              <div class="flex gap-2">
+                <button (click)="openEdit(s)" class="text-blue-600 text-xs font-medium hover:text-blue-800">Editar</button>
+                <button (click)="openImage(s)" class="text-green-600 text-xs font-medium hover:text-green-800">Imagen</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de formulario -->
+@if (showForm()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0">
+        <h2 class="text-lg font-semibold text-gray-900">{{ editing() ? 'Editar estadio' : 'Nuevo estadio' }}</h2>
+        <button (click)="showForm.set(false)" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto flex-1">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+            <input [(ngModel)]="form.name" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <!-- Selector de equipo -->
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Equipo asignado</label>
+            
+            <!-- Buscador de equipos -->
+            <div class="relative mb-2">
+              <input 
+                [ngModel]="teamSearch()" 
+                (ngModelChange)="teamSearch.set($event)"
+                type="text" 
+                placeholder="Buscar equipo..." 
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400"
+              />
+              @if (teamSearch()) {
+                <button (click)="teamSearch.set('')" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">×</button>
+              }
+            </div>
+            
+            <!-- Lista de equipos -->
+            <div class="border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+              <!-- Opción "Sin equipo" -->
+              <div 
+                (click)="form.teamId = null"
+                [class.bg-blue-50]="form.teamId === null"
+                class="flex items-center gap-3 px-3 py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                <div 
+                  [class.bg-blue-600]="form.teamId === null"
+                  [class.border-blue-600]="form.teamId === null"
+                  class="w-4 h-4 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                  @if (form.teamId === null) {
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                  }
+                </div>
+                <span class="text-gray-500 italic">Sin equipo asignado</span>
+              </div>
+              
+              @for (team of filteredTeams(); track team.id) {
+                <div 
+                  (click)="form.teamId = team.id"
+                  [class.bg-blue-50]="form.teamId === team.id"
+                  class="flex items-center gap-3 px-3 py-2 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div 
+                    [class.bg-blue-600]="form.teamId === team.id"
+                    [class.border-blue-600]="form.teamId === team.id"
+                    class="w-4 h-4 border-2 border-gray-300 rounded-full flex items-center justify-center">
+                    @if (form.teamId === team.id) {
+                      <div class="w-2 h-2 bg-white rounded-full"></div>
+                    }
+                  </div>
+                  @if (team.logoUrl) {
+                    <img [src]="team.logoUrl" class="w-6 h-6 object-contain rounded" />
+                  }
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-900">{{ team.name }}</div>
+                    <div class="text-xs text-gray-500">{{ team.city }}, {{ team.country }}</div>
+                  </div>
+                </div>
+              }
+              
+              @if (filteredTeams().length === 0 && teamSearch()) {
+                <div class="px-3 py-4 text-center text-gray-500 text-sm">
+                  No se encontraron equipos
+                </div>
+              }
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Ciudad</label>
+            <input [(ngModel)]="form.city" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">País</label>
+            <input [(ngModel)]="form.country" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Capacidad</label>
+            <input [(ngModel)]="form.capacity" type="number" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Inauguración</label>
+            <input [(ngModel)]="form.inaugurated" type="number" placeholder="Año" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Superficie</label>
+            <input [(ngModel)]="form.surface" placeholder="Grass, Hybrid, Artificial..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          </div>
+          
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">URL imagen</label>
+            <input [(ngModel)]="form.imageUrl" placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+            @if (form.imageUrl) {
+              <div class="mt-2">
+                <img [src]="form.imageUrl" alt="Preview" class="h-16 object-contain rounded" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      
+      <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 sticky bottom-0">
+        <button (click)="showForm.set(false)" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Cancelar</button>
+        <button (click)="save()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+          {{ editing() ? 'Guardar' : 'Crear' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de imagen -->
+@if (showImageModal()) {
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Imagen — {{ selectedStadium()?.name }}</h2>
+        <button (click)="showImageModal.set(false)" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+      </div>
+      
+      <div class="p-6">
+        @if (selectedStadium()?.imageUrl) {
+          <div class="flex justify-center mb-4">
+            <img [src]="selectedStadium()!.imageUrl" alt="stadio" class="w-32 h-32 object-cover rounded-lg border border-gray-200" />
+          </div>
+        }
+        
+        <label class="block text-xs font-medium text-gray-600 mb-1">URL de imagen</label>
+        <div class="flex gap-2 mb-4">
+          <input [(ngModel)]="imageUrl" placeholder="https://..." 
+            class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+          <button (click)="saveImageUrl()" 
+            class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+            Guardar URL
+          </button>
+        </div>
+        
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-medium text-gray-600 mb-2">O subir archivo</label>
+          <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+            <span class="text-2xl mb-1">📁</span>
+            <span class="text-xs text-gray-500">Click para seleccionar imagen</span>
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+          </label>
+          
+          @if (selectedFile()) {
+            <div class="mt-3 flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+              <span class="text-xs text-gray-600 truncate">{{ selectedFile()!.name }}</span>
+              <button (click)="uploadFile()" 
+                class="ml-2 px-3 py-1 bg-green-600 text-white rounded-lg text-xs font-medium hover:bg-green-700"
+                [disabled]="uploading()">
+                {{ uploading() ? 'Subiendo...' : 'Subir' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

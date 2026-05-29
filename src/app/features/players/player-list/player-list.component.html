@@ -1,0 +1,68 @@
+<div class="page">
+  <div class="page-inner">
+    <div class="page-header">
+      <h1>Jugadores</h1>
+      <div class="filters">
+        <!-- Vinculación directa al Signal usando $event para la corrección -->
+        <input 
+          [ngModel]="search()" 
+          (ngModelChange)="search.set($event)" 
+          placeholder="Buscar jugador..." 
+          class="search-input" 
+        />
+        <div class="sport-filters">
+          @for (s of sports; track s.value) {
+            <!-- Modificamos directamente el valor del Signal activeSport -->
+            <button 
+              class="sport-pill" 
+              [class.active]="activeSport() === s.value" 
+              (click)="activeSport.set(s.value)">
+              {{ s.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="loading">Cargando jugadores...</div>
+    } @else {
+      <div class="players-grid">
+        @for (p of filtered(); track p.id) {
+          <a [routerLink]="['/players', p.slug]" class="player-card">
+            <!-- Forzamos a Angular a saltarse la validación estricta de esta propiedad -->
+            <div class="player-card-glow" [style.background]="$any(p.team)?.primaryColor || '#6366f1'"></div>
+
+            <div class="p-photo">
+              @if (p.photoUrl) {
+                <img [src]="p.photoUrl" [alt]="p.firstName" />
+              } @else {
+                <span>{{ p.firstName[0] }}{{ p.lastName[0] }}</span>
+              }
+            </div>
+            
+            <div class="p-info">
+              <div class="p-name">{{ p.firstName }} {{ p.lastName }}</div>
+              <div class="p-team">{{ p.team?.name }}</div>
+              <div class="p-tags">
+                @if (p.position) { 
+                  <span class="tag pos-tag pos-{{ p.position.code.toLowerCase() }}">{{ p.position.code }}</span> 
+                }
+                @if (p.nationality) { 
+                  <span class="tag">{{ p.nationality }}</span> 
+                }
+                @if (p.jerseyNumber) { 
+                  <span class="tag jersey-tag">#{{ p.jerseyNumber }}</span> 
+                }
+              </div>
+            </div>
+            <div class="card-arrow">→</div>
+          </a>
+        } @empty {
+          <!-- Bloque automático de Angular si la lista filtrada queda vacía -->
+          <div class="no-results">No se encontraron jugadores que coincidan con la búsqueda.</div>
+        }
+      </div>
+    }
+  </div>
+</div>

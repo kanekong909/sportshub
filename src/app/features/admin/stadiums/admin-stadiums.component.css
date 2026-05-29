@@ -1,0 +1,12 @@
+/* En admin-stadiums.component.css o global styles */
+.stadium-image-preview {
+  transition: transform 0.2s ease;
+}
+
+.stadium-image-preview:hover {
+  transform: scale(2);
+  cursor: pointer;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}

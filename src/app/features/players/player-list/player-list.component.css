@@ -1,0 +1,401 @@
+/* MOBILE-FIRST (base: < 640px) */
+.page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  min-height: calc(100vh - 56px);
+  padding: 24px 16px;
+}
+
+.page-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* HEADER */
+.page-header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+/* FILTROS */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(148, 163, 184, 0.6);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  font-size: 14px;
+  color: #f1f5f9;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.search-input:focus {
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sport-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sport-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  cursor: pointer;
+  color: rgba(148, 163, 184, 0.8);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.sport-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+
+.sport-pill.active {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 14px;
+}
+
+/* PLAYERS GRID - mobile (1 columna) */
+.players-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.player-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px; /* Bordes redondeados más suaves */
+  padding: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  backdrop-filter: blur(8px); /* Efecto cristal de fondo */
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto Hover Fluido */
+.player-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-4px) scale(1.01);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 
+              0 0 15px rgba(255, 255, 255, 0.03);
+}
+
+/* Resplandor de fondo dinámico por tarjeta */
+.player-card-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  opacity: 0.12;
+  filter: blur(35px);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.player-card:hover .player-card-glow {
+  opacity: 0.22;
+  transform: scale(1.25) translate(-10px, 10px);
+}
+
+/* Avatar / Foto del Jugador */
+.p-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+/* La foto resalta sutilmente en hover */
+.player-card:hover .p-photo {
+  transform: scale(1.06);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.p-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Iniciales cuando no hay foto */
+.p-photo span {
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #a5b4fc, #6366f1);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Información del Jugador */
+.p-info {
+  flex: 1;
+}
+
+.p-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+
+.p-team {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+/* Estilos de los Tags / Badges */
+.p-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Flecha de Acción */
+.card-arrow {
+  color: rgba(148, 163, 184, 0.3);
+  font-size: 20px;
+  font-weight: 300;
+  padding-left: 4px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.player-card:hover .card-arrow {
+  transform: translateX(6px);
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Posiciones */
+.pos-gk {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.pos-def {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.pos-mid {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.pos-fwd {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.pos-pg, .pos-sg, .pos-sf, .pos-pf, .pos-c {
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.pos-qb, .pos-rb, .pos-wr, .pos-te, .pos-lb, .pos-cb {
+  background: rgba(234, 179, 8, 0.2);
+  color: #fde047;
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+/* ============================================ */
+/* TABLET (640px y más) */
+/* ============================================ */
+@media (min-width: 640px) {
+  .page {
+    padding: 32px 24px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .filters {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .search-wrapper {
+    width: 280px;
+    flex-shrink: 0;
+  }
+
+  .sport-filters {
+    flex-wrap: nowrap;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+/* ============================================ */
+/* DESKTOP (1024px y más) */
+/* ============================================ */
+@media (min-width: 1024px) {
+  .page {
+    padding: 40px 32px;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 24px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .search-wrapper {
+    width: 320px;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .player-card {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .p-photo {
+    width: 64px;
+    height: 64px;
+    font-size: 17px;
+  }
+
+  .p-name {
+    font-size: 18px;
+  }
+
+  .p-team {
+    font-size: 13px;
+  }
+
+  .tag {
+    font-size: 11px;
+  }
+}
+
+/* ============================================ */
+/* XL SCREENS (1440px y más) */
+/* ============================================ */
+@media (min-width: 1440px) {
+  .page {
+    padding: 48px 40px;
+  }
+
+  .page-inner {
+    max-width: 1200px;
+  }
+
+  .players-grid {
+    gap: 20px;
+  }
+}
+
+/* Animaciones */
+@media (prefers-reduced-motion: no-preference) {
+  .player-card,
+  .sport-pill,
+  .search-input,
+  .card-arrow {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
