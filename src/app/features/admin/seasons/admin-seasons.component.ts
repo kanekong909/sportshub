@@ -9,7 +9,7 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './admin-seasons.component.html',
-  styleUrl : './admin-seasons.component.css'
+  styleUrl: './admin-seasons.component.css'
 })
 export class AdminSeasonsComponent implements OnInit {
   tab           = signal<'seasons' | 'squad'>('seasons');
@@ -45,7 +45,7 @@ export class AdminSeasonsComponent implements OnInit {
   constructor(
     private seasonService: SeasonService,
     private adminService: AdminService,
-    private toast: ToastService
+    private toast: ToastService  // ← Asegúrate de que esté inyectado
   ) {}
 
   ngOnInit() {
@@ -62,8 +62,14 @@ export class AdminSeasonsComponent implements OnInit {
   }
 
   loadSeasons() {
-    this.seasonService.getAll(this.filterLeagueId || undefined)
-      .subscribe(s => this.seasons.set(s));
+    this.adminService.getAllSeasons(this.filterLeagueId || undefined)
+      .subscribe({
+        next: (s) => this.seasons.set(s),
+        error: (err) => {
+          console.error('Error loading seasons:', err);
+          this.toast.error('Error al cargar las temporadas');
+        }
+      });
   }
 
   openCreateSeason() {
@@ -89,13 +95,33 @@ export class AdminSeasonsComponent implements OnInit {
 
   saveSeason() {
     const obs = this.editingSeason()
-      ? this.seasonService.update(this.editingSeason().id, this.seasonForm)
-      : this.seasonService.create(this.seasonForm);
-    obs.subscribe(() => { this.loadSeasons(); this.cancelEditSeason(); });
+      ? this.adminService.updateSeason(this.editingSeason().id, this.seasonForm)
+      : this.adminService.createSeason(this.seasonForm);
+
+    obs.subscribe({
+      next: () => {
+        this.toast.success(this.editingSeason() ? 'Temporada actualizada' : 'Temporada creada');
+        this.loadSeasons();
+        this.cancelEditSeason();
+      },
+      error: (err) => {
+        console.error('Error saving season:', err);
+        this.toast.error('Error al guardar la temporada');
+      }
+    });
   }
 
   setCurrent(s: any) {
-    this.seasonService.setCurrent(s.id).subscribe(() => this.loadSeasons());
+    this.adminService.setCurrentSeason(s.id).subscribe({
+      next: () => {
+        this.toast.success(`"${s.name}" marcada como temporada actual`);
+        this.loadSeasons();
+      },
+      error: (err) => {
+        console.error('Error setting current season:', err);
+        this.toast.error('Error al marcar como actual');
+      }
+    });
   }
 
   // ---- PLANTILLAS ----
@@ -124,21 +150,25 @@ export class AdminSeasonsComponent implements OnInit {
     if (relevantSeasons.length > 0) {
       this.teamSeasons.set(relevantSeasons);
     } else {
-      this.seasonService.getAll().subscribe(all => this.teamSeasons.set(all));
+      this.adminService.getAllSeasons().subscribe(all => this.teamSeasons.set(all));
     }
   }
 
-  // Cargar equipo
   loadSquad() {
     if (!this.squadTeamId || !this.squadSeasonId) return;
     this.seasonService.getSquad(this.squadTeamId, this.squadSeasonId)
-      .subscribe(s => {
-        this.squad.set(s);
-        this.filterAvailablePlayers();
+      .subscribe({
+        next: (s) => {
+          this.squad.set(s);
+          this.filterAvailablePlayers();
+        },
+        error: (err) => {
+          console.error('Error loading squad:', err);
+          this.toast.error('Error al cargar la plantilla');
+        }
       });
   }
 
-  // Filtro de jugadores disponibles para añadir a la plantilla, excluyendo los que ya están en ella y buscando por nombre
   filterAvailablePlayers() {
     const inSquad = new Set(this.squad().map((e: any) => e.playerId));
     const q = this.searchAddPlayer.toLowerCase();
@@ -149,52 +179,74 @@ export class AdminSeasonsComponent implements OnInit {
     );
   }
 
-  // Añadir jugador al equipo
   addPlayerToSquad(player: any) {
     const note = this.playerNotes[player.id] || '';
     this.seasonService.addPlayer(player.id, this.squadTeamId, this.squadSeasonId, note)
-      .subscribe(() => {
-        this.loadSquad();
-        this.searchAddPlayer = '';
-        delete this.playerNotes[player.id];
+      .subscribe({
+        next: () => {
+          this.toast.success(`${player.firstName} ${player.lastName} añadido a la plantilla`);
+          this.loadSquad();
+          this.searchAddPlayer = '';
+          delete this.playerNotes[player.id];
+        },
+        error: (err) => {
+          console.error('Error adding player:', err);
+          this.toast.error('Error al añadir el jugador');
+        }
       });
   }
 
-  // Eliminar jugador del equipo
   removeFromSquad(entry: any) {
     this.seasonService.removePlayer(entry.playerId, this.squadTeamId, this.squadSeasonId)
-      .subscribe(() => this.loadSquad());
+      .subscribe({
+        next: () => {
+          this.toast.info(`Jugador desactivado de la plantilla`);
+          this.loadSquad();
+        },
+        error: (err) => {
+          console.error('Error removing player:', err);
+          this.toast.error('Error al desactivar el jugador');
+        }
+      });
   }
 
-  // Obtener nombre de temporada
   getSeasonName() {
     return this.teamSeasons().find(s => s.id === this.squadSeasonId)?.name || '';
   }
 
-  // FILTRAR
   filterLeagues() {
     const q = this.searchLeague.toLowerCase();
     this.filteredLeagues.set(
       q ? this.leagues().filter(l => l.name.toLowerCase().includes(q)) : this.leagues()
     );
   }
+
   filterTeamsSquad() {
     const q = this.searchTeamSquad.toLowerCase();
     this.filteredTeams.set(
       q ? this.teams().filter(t => t.name.toLowerCase().includes(q)) : this.teams()
     );
   }
+
   selectTeamForSquad(team: any) {
     this.squadTeamId = team.id;
     this.onTeamChange();
   }
 
-  // NOTAS JUGADOR
   toggleActive(entry: any) {
-  this.seasonService.updateNote(
-    entry.playerId, this.squadTeamId, this.squadSeasonId,
-    entry.note || '', !entry.isActive
-  ).subscribe(() => this.loadSquad());
+    this.seasonService.updateNote(
+      entry.playerId, this.squadTeamId, this.squadSeasonId,
+      entry.note || '', !entry.isActive
+    ).subscribe({
+      next: () => {
+        this.toast.success(entry.isActive ? 'Jugador desactivado' : 'Jugador activado');
+        this.loadSquad();
+      },
+      error: (err) => {
+        console.error('Error toggling active:', err);
+        this.toast.error('Error al cambiar el estado');
+      }
+    });
   }
 
   openEditNote(entry: any) {
@@ -208,9 +260,16 @@ export class AdminSeasonsComponent implements OnInit {
     this.seasonService.updateNote(
       e.playerId, this.squadTeamId, this.squadSeasonId,
       this.editNoteText, this.editNoteActive
-    ).subscribe(() => {
-      this.loadSquad();
-      this.editingNote.set(null);
+    ).subscribe({
+      next: () => {
+        this.toast.success('Nota actualizada');
+        this.loadSquad();
+        this.editingNote.set(null);
+      },
+      error: (err) => {
+        console.error('Error saving note:', err);
+        this.toast.error('Error al guardar la nota');
+      }
     });
   }
 
@@ -222,7 +281,10 @@ export class AdminSeasonsComponent implements OnInit {
           this.loadSquad();
           this.toast.success(`${nombre} eliminado de la plantilla`);
         },
-        error: () => this.toast.error(`Error al quitar a ${nombre}`)
+        error: (err) => {
+          console.error('Error deleting player:', err);
+          this.toast.error(`Error al quitar a ${nombre}`);
+        }
       });
   }
 }

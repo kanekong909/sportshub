@@ -280,7 +280,7 @@ export class AdminStatsComponent implements OnInit {
   ngOnInit() {
     this.admin.getTeams().subscribe(t => this.allTeams.set(t));
     this.admin.getLeagues().subscribe(l => this.leagues.set(l));
-    this.admin.getSeasons().subscribe(s => this.seasons.set(s));
+    this.admin.getAllSeasons().subscribe((s: any[]) => this.seasons.set(s));
 
     // NUEVO: Escuchar cambios en el selector de temporada
     this.statForm.get('season')?.valueChanges.subscribe(() => {

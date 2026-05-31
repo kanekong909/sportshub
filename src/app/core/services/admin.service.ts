@@ -89,7 +89,25 @@ export class AdminService {
   }
 
   // Temporadas
-  getSeasons() {
-    return this.http.get<string[]>(`${this.api}/seasons`);
+  getAllSeasons(leagueId?: string) {
+    const params: any = {};
+    if (leagueId) params.leagueId = leagueId;
+    return this.http.get<any[]>(`${this.api}/seasons`, { params });
+  }
+
+  createSeason(data: any) {
+    return this.http.post<any>(`${this.api}/seasons`, data);
+  }
+
+  updateSeason(id: string, data: any) {
+    return this.http.put<any>(`${this.api}/seasons/${id}`, data);
+  }
+
+  setCurrentSeason(id: string) {
+    return this.http.patch(`${this.api}/seasons/${id}/set-current`, {});
+  }
+
+  deleteSeason(id: string) {
+    return this.http.delete(`${this.api}/seasons/${id}`);
   }
 }
