@@ -24,4 +24,12 @@ export class TeamsService {
   getStats(slug: string) {
     return this.http.get<TeamSeasonStats[]>(`${this.api}/${slug}/stats`);
   }
+
+  getTeamSeasons(slug: string) {
+    return this.http.get<any[]>(`${this.api}/${slug}/seasons`);
+  }
+
+  getSquadBySeason(slug: string, seasonId: string) {
+    return this.http.get<any[]>(`${this.api}/${slug}/squad/${seasonId}`);
+  }
 }

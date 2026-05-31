@@ -67,24 +67,56 @@
     <!-- PLANTILLA -->
     @if (activeTab() === 'squad') {
       <div class="card">
-        <h2 class="card-title">Plantilla</h2>
-        <div class="squad-grid">
-          @for (player of t.players || []; track player.id) {
-            <a [routerLink]="['/players', player.slug]" class="squad-card">
-              <div class="team-card-glow" [style.background]="t.primaryColor || '#3b82f6'"></div>
-              <div class="sq-photo" [style.background]="(t.primaryColor || '#3b82f6') + '18'">
-                @if (player.photoUrl) {
-                  <img [src]="player.photoUrl" [alt]="player.firstName" />
-                } @else {
-                  <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+        <div class="squad-header">
+          <h2 class="card-title" style="margin-bottom:0">Plantilla</h2>
+
+          <!-- Selector de temporada -->
+          @if (teamSeasons().length > 0) {
+            <div class="season-selector">
+              <span class="season-label">Temporada</span>
+              <div class="season-pills">
+               <button
+                  (click)="loadCurrentSquad()"
+                  class="season-pill"
+                  [class.active]="selectedSeasonId() === ''">
+                  Actual
+                </button>
+                @for (s of teamSeasons(); track s.id) {
+                  <button
+                    (click)="loadSeasonSquad(s)"
+                    class="season-pill"
+                    [class.active]="selectedSeasonId() === s.id">
+                    {{ s.name }}
+                  </button>
                 }
               </div>
-              <div class="sq-num">#{{ player.jerseyNumber }}</div>
-              <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
-              <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code }}</span>
-            </a>
+            </div>
           }
         </div>
+
+        @if (squadLoading()) {
+          <div class="squad-loading">Cargando plantilla...</div>
+        } @else if (displayPlayers().length === 0) {
+          <div class="squad-empty">No hay jugadores registrados para esta temporada</div>
+        } @else {
+          <div class="squad-grid">
+            @for (player of displayPlayers(); track player.id) {
+              <a [routerLink]="['/players', player.slug]" class="squad-card">
+                <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                  @if (player.photoUrl) {
+                    <img [src]="player.photoUrl" [alt]="player.firstName" />
+                  } @else {
+                    <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                  }
+                </div>
+                <div class="sq-num">#{{ player.jerseyNumber }}</div>
+                <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code }}</span>
+              </a>
+            }
+          </div>
+        }
       </div>
     }
 

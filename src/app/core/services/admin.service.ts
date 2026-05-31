@@ -22,7 +22,9 @@ export class AdminService {
   }
 
   // Players
-  getPlayers(search = '') { return this.http.get<any[]>(`${this.api}/players`, { params: { search } }); }
+  getPlayers(teamId = '', search = '') {
+    return this.http.get<any[]>(`${this.api}/players`, { params: { search, ...(teamId && { teamId }) } });
+  }
   createPlayer(data: any) { return this.http.post<any>(`${this.api}/players`, data); }
   updatePlayer(id: string, data: any) { return this.http.put<any>(`${this.api}/players/${id}`, data); }
   deletePlayer(id: string){ return this.http.delete(`${this.api}/players/${id}`); }
@@ -67,4 +69,27 @@ export class AdminService {
     return this.http.post<any>(`${this.api}/transfers`, { playerId, toTeamId, description });
   }
   getFreeAgents() { return this.http.get<any[]>(`${this.api}/free-agents`); }
+
+  // STATS
+  // Stats - Estadísticas de equipo
+  getTeamSeasonStats(query: any = {}) {
+    return this.http.get<any[]>(`${this.api}/team-season-stats`, { params: query });
+  }
+
+  createTeamSeasonStat(data: any) {
+    return this.http.post<any>(`${this.api}/team-season-stats`, data);
+  }
+
+  updateTeamSeasonStat(id: string, data: any) {
+    return this.http.put<any>(`${this.api}/team-season-stats/${id}`, data);
+  }
+
+  deleteTeamSeasonStat(id: string) {
+    return this.http.delete(`${this.api}/team-season-stats/${id}`);
+  }
+
+  // Temporadas
+  getSeasons() {
+    return this.http.get<string[]>(`${this.api}/seasons`);
+  }
 }

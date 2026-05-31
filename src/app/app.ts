@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { AuthService } from './core/services/auth.service';
+import { ToastComponent } from './shared/components/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent],
+  imports: [RouterOutlet, NavbarComponent, ToastComponent],
   template: `
     @if (auth.isLoggedIn()) {
       <app-navbar />
@@ -14,6 +15,7 @@ import { AuthService } from './core/services/auth.service';
     <main [class.with-nav]="auth.isLoggedIn()">
       <router-outlet />
     </main>
+    <app-toast />
   `,
   styles: [`
     main { min-height: 100vh; }

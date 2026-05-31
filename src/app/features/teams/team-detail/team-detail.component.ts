@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TeamsService } from '../../../core/services/teams.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SeasonService } from '../../../core/services/season.service';
 import { Team } from '../../../core/models';
 
 @Component({
@@ -27,6 +28,11 @@ export class TeamDetailComponent implements OnInit {
     { key: 'titles',  label: 'Palmarés'     },
   ];
 
+  teamSeasons      = signal<any[]>([]);
+  selectedSeasonId = signal<string>('');
+  displayPlayers   = signal<any[]>([]);
+  squadLoading     = signal(false);
+
   // 2. Signals Computados (Se calculan automáticamente cuando 'team' cambia)
   heroStats = computed(() => {
     const t = this.team();
@@ -46,7 +52,7 @@ export class TeamDetailComponent implements OnInit {
   groupedTitles = computed(() => {
     const titles = this.team()?.titles || [];
     const map = new Map<string, number>();
-    
+
     titles.forEach(t => map.set(t.name, (map.get(t.name) || 0) + 1));
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
   });
@@ -56,19 +62,21 @@ export class TeamDetailComponent implements OnInit {
     private teamsService: TeamsService,
     private userService: UserService,
     public auth: AuthService,
+    private seasonService: SeasonService,
   ) {}
 
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug')!;
-    
     this.teamsService.getBySlug(slug).subscribe({
       next: (team) => {
         this.team.set(team);
         this.loading.set(false);
+        // this.displayPlayers.set(team.players || []);
+        this.loadCurrentSquad();
+        this.loadTeamSeasons(slug);
       },
       error: () => this.loading.set(false)
     });
-
     if (this.auth.isLoggedIn()) {
       this.userService.getFavoriteTeams().subscribe({
         next: (favs) => {
@@ -88,5 +96,45 @@ export class TeamDetailComponent implements OnInit {
     } else {
       this.userService.addFavoriteTeam(id).subscribe(() => this.isFavorite.set(true));
     }
+  }
+
+  loadTeamSeasons(slug: string) {
+    this.teamsService.getTeamSeasons(slug).subscribe(seasons => {
+      this.teamSeasons.set(seasons);
+    });
+  }
+
+  loadCurrentPlayers() {
+    this.selectedSeasonId.set('');
+    this.displayPlayers.set(this.team()?.players || []);
+  }
+
+  loadSeasonSquad(season: any) {
+    this.selectedSeasonId.set(season.id);
+    this.squadLoading.set(true);
+    const slug = this.route.snapshot.paramMap.get('slug')!;
+    this.teamsService.getSquadBySeason(slug, season.id).subscribe(entries => {
+      this.displayPlayers.set(entries.map((e: any) => e.player));
+      this.squadLoading.set(false);
+    });
+  }
+
+  loadCurrentSquad() {
+    const currentTeam = this.team();
+    if (!currentTeam) return;
+
+    this.squadLoading.set(true);
+    this.seasonService.getCurrentSquad(currentTeam.id).subscribe({
+      next: (data) => {
+        // data viene como PlayerSeasonTeam[] con player anidado
+        this.displayPlayers.set(data.map((item: any) => item.player));
+        this.selectedSeasonId.set(''); // marca "Actual" como seleccionado
+        this.squadLoading.set(false);
+      },
+      error: () => {
+        this.displayPlayers.set([]);
+        this.squadLoading.set(false);
+      }
+    });
   }
 }

@@ -1,0 +1,287 @@
+    <div class="p-8">
+      <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Temporadas y Plantillas</h1>
+        <p class="text-gray-500 text-sm mt-1">Gestiona temporadas por liga y plantillas históricas de equipos</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-1 mb-6 bg-gray-100 rounded-xl p-1 w-fit">
+        <button (click)="tab.set('seasons')" [class]="tab() === 'seasons' ? 'tab-on' : 'tab-off'">📅 Temporadas</button>
+        <button (click)="tab.set('squad')"   [class]="tab() === 'squad'   ? 'tab-on' : 'tab-off'">👥 Plantillas</button>
+      </div>
+
+      <!-- TAB TEMPORADAS -->
+      @if (tab() === 'seasons') {
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Lista de temporadas -->
+          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 class="text-sm font-semibold text-gray-900">Temporadas creadas</h2>
+              <button (click)="openCreateSeason()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
+                + Nueva
+              </button>
+            </div>
+
+            <!-- Filtro por liga -->
+            <div class="px-5 py-3 border-b border-gray-50">
+              <input [(ngModel)]="searchLeague" (ngModelChange)="filterLeagues()"
+                placeholder="Buscar liga..."
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400 mb-2" />
+              <div class="max-h-40 overflow-y-auto space-y-1">
+                <div (click)="filterLeagueId=''; searchLeague=''; filteredLeagues.set(leagues()); loadSeasons()"
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-50"
+                  [class.bg-blue-50]="filterLeagueId === ''">
+                  <span class="text-sm text-gray-500">Todas las ligas</span>
+                </div>
+                @for (l of filteredLeagues(); track l.id) {
+                  <div (click)="filterLeagueId=l.id; loadSeasons()"
+                    class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-50"
+                    [class.bg-blue-50]="filterLeagueId === l.id">
+                    @if (l.logoUrl) {
+                      <img [src]="l.logoUrl" class="w-5 h-5 object-contain flex-shrink-0" />
+                    } @else {
+                      <div class="w-5 h-5 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400 flex-shrink-0">{{ l.name[0] }}</div>
+                    }
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm text-gray-900 truncate">{{ l.name }}</div>
+                      <div class="text-xs text-gray-400">{{ l.sport?.name }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="divide-y divide-gray-50 max-h-96 overflow-y-auto">
+              @for (s of seasons(); track s.id) {
+                <div class="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-medium text-gray-900">{{ s.name }}</span>
+                      @if (s.current) {
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Actual</span>
+                      }
+                    </div>
+                    <div class="text-xs text-gray-400 mt-0.5">{{ s.league?.name }}</div>
+                  </div>
+                  <div class="flex gap-2">
+                    @if (!s.current) {
+                      <button (click)="setCurrent(s)" class="text-xs text-green-600 hover:text-green-800 font-medium">
+                        Marcar actual
+                      </button>
+                    }
+                    <button (click)="openEditSeason(s)" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                      Editar
+                    </button>
+                  </div>
+                </div>
+              }
+              @if (seasons().length === 0) {
+                <div class="px-5 py-8 text-center text-gray-400 text-sm">No hay temporadas creadas</div>
+              }
+            </div>
+          </div>
+
+          <!-- Formulario crear/editar temporada -->
+          <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="text-sm font-semibold text-gray-900 mb-4">
+              {{ editingSeason() ? 'Editar temporada' : 'Nueva temporada' }}
+            </h2>
+            <div class="flex flex-col gap-4">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+                <input [(ngModel)]="seasonForm.name" placeholder="2024-25"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Liga *</label>
+                <select [(ngModel)]="seasonForm.leagueId"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400">
+                  <option value="">Seleccionar liga...</option>
+                  @for (l of leagues(); track l.id) {
+                    <option [value]="l.id">{{ l.name }} — {{ l.sport?.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Fecha inicio</label>
+                  <input [(ngModel)]="seasonForm.startDate" type="date"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Fecha fin</label>
+                  <input [(ngModel)]="seasonForm.endDate" type="date"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <input [(ngModel)]="seasonForm.current" type="checkbox" id="current" class="rounded" />
+                <label for="current" class="text-sm text-gray-700">Marcar como temporada actual</label>
+              </div>
+              <div class="flex gap-3 pt-2">
+                @if (editingSeason()) {
+                  <button (click)="cancelEditSeason()" class="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">
+                    Cancelar
+                  </button>
+                }
+                <button (click)="saveSeason()"
+                  class="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                  {{ editingSeason() ? 'Guardar cambios' : 'Crear temporada' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- TAB PLANTILLAS -->
+      @if (tab() === 'squad') {
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- Selector equipo + temporada -->
+          <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="text-sm font-semibold text-gray-900 mb-4">Seleccionar equipo y temporada</h2>
+            <div class="flex flex-col gap-3">
+              <!-- Selector de equipo y temporada para gestionar la plantilla. Solo se muestran temporadas relacionadas con las ligas del equipo seleccionado. -->
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Equipo</label>
+                <input [(ngModel)]="searchTeamSquad" (ngModelChange)="filterTeamsSquad()"
+                  placeholder="Buscar equipo..."
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400 mb-2" />
+                <div class="max-h-48 overflow-y-auto space-y-1 border border-gray-100 rounded-lg">
+                  @for (t of filteredTeams(); track t.id) {
+                    <div (click)="selectTeamForSquad(t)"
+                      class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                      [class.bg-blue-50]="squadTeamId === t.id">
+                      <div class="w-7 h-7 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        @if (t.logoUrl) {
+                          <img [src]="t.logoUrl" [alt]="t.name" class="w-full h-full object-contain" />
+                        } @else {
+                          <span class="text-xs font-bold text-gray-400">{{ t.shortName }}</span>
+                        }
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900 truncate">{{ t.name }}</div>
+                        <div class="text-xs text-gray-400">{{ t.leagues?.[0]?.league?.name }}</div>
+                      </div>
+                      @if (squadTeamId === t.id) {
+                        <span class="text-blue-600 text-xs">✓</span>
+                      }
+                    </div>
+                  }
+                  @if (filteredTeams().length === 0 && searchTeamSquad.length > 0) {
+                    <div class="px-3 py-4 text-center text-gray-400 text-xs">No se encontraron equipos</div>
+                  }
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Temporada</label>
+                <select [(ngModel)]="squadSeasonId" (ngModelChange)="loadSquad()"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400"
+                  [disabled]="!squadTeamId">
+                  <option value="">Seleccionar temporada...</option>
+                  @for (s of teamSeasons(); track s.id) {
+                    <option [value]="s.id">{{ s.name }} {{ s.current ? '(actual)' : '' }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Añadir jugador a la plantilla -->
+            @if (squadTeamId && squadSeasonId) {
+              <div class="mt-5 pt-5 border-t border-gray-100">
+                <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">
+                  Añadir jugador a plantilla
+                </h3>
+
+                <input [(ngModel)]="searchAddPlayer" (ngModelChange)="filterAvailablePlayers()"
+                  placeholder="Filtrar jugadores del equipo..."
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400 mb-2" />
+
+                @if (availablePlayers().length === 0 && teamPlayers().length === 0) {
+                  <p class="text-gray-400 text-xs text-center py-4">
+                    Este equipo no tiene jugadores registrados
+                  </p>
+                } @else if (availablePlayers().length === 0 && teamPlayers().length > 0) {
+                  <p class="text-gray-400 text-xs text-center py-4">
+                    Todos los jugadores del equipo ya están en esta plantilla
+                  </p>
+                } @else {
+                  <div class="max-h-48 overflow-y-auto space-y-1 border border-gray-100 rounded-lg">
+                    @for (p of availablePlayers(); track p.id) {
+                      <div class="flex items-center gap-2 p-2 hover:bg-gray-50 transition-colors">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden flex-shrink-0">
+                          @if (p.photoUrl) {
+                            <img [src]="p.photoUrl" [alt]="p.firstName" class="w-full h-full object-cover" />
+                          } @else {
+                            {{ p.firstName[0] }}{{ p.lastName[0] }}
+                          }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="text-xs font-medium text-gray-900 truncate">
+                            @if (p.jerseyNumber) { <span class="text-gray-400 mr-1">#{{ p.jerseyNumber }}</span> }
+                            {{ p.firstName }} {{ p.lastName }}
+                          </div>
+                          <div class="text-xs text-gray-400">{{ p.position?.code }} · {{ p.nationality }}</div>
+                        </div>
+                        <button (click)="addPlayerToSquad(p)"
+                          class="px-2 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 flex-shrink-0">
+                          + Añadir
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Plantilla actual -->
+          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100">
+              <h2 class="text-sm font-semibold text-gray-900">
+                Plantilla
+                @if (squadSeasonId) { <span class="text-gray-400 font-normal">· {{ getSeasonName() }}</span> }
+              </h2>
+              <p class="text-xs text-gray-400 mt-0.5">{{ squad().length }} jugadores</p>
+            </div>
+
+            @if (!squadTeamId || !squadSeasonId) {
+              <div class="p-8 text-center text-gray-400 text-sm">Selecciona un equipo y temporada</div>
+            } @else if (squad().length === 0) {
+              <div class="p-8 text-center text-gray-400 text-sm">No hay jugadores en esta plantilla</div>
+            } @else {
+              <div class="divide-y divide-gray-50 max-h-[500px] overflow-y-auto">
+                @for (entry of squad(); track entry.id) {
+                  <div class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden flex-shrink-0">
+                      @if (entry.player.photoUrl) {
+                        <img [src]="entry.player.photoUrl" class="w-full h-full object-cover" />
+                      } @else {
+                        {{ entry.player.firstName[0] }}{{ entry.player.lastName[0] }}
+                      }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-medium text-gray-900">
+                        @if (entry.player.jerseyNumber) { <span class="text-gray-400 mr-1">#{{ entry.player.jerseyNumber }}</span> }
+                        {{ entry.player.firstName }} {{ entry.player.lastName }}
+                      </div>
+                      <div class="text-xs text-gray-400">{{ entry.player.position?.name }}</div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium"
+                      [class]="entry.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'">
+                      {{ entry.isActive ? 'Activo' : 'Inactivo' }}
+                    </span>
+                    <button (click)="removeFromSquad(entry)"
+                      class="text-red-400 hover:text-red-600 text-xs font-medium ml-1">
+                      Quitar
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>

@@ -53,6 +53,7 @@ export class AdminDashboardComponent implements OnInit {
     { label: 'Añadir equipo',    desc: 'Crear nuevo equipo',       icon: '➕', bg: '#EFF6FF', link: '/admin/teams'   },
     { label: 'Añadir jugador',   desc: 'Registrar nuevo jugador',  icon: '👤', bg: '#F0FDF4', link: '/admin/players' },
     { label: 'Gestionar imágenes', desc: 'Logos y fotos',         icon: '🖼️', bg: '#FFFBEB', link: '/admin/teams'   },
+    { label: 'Añadir estadística', desc: 'Registrar nueva temporada', icon: '📈', bg: '#FDF2F8', link: '/admin/stats' },
   ];
 
   constructor(private admin: AdminService) {}
