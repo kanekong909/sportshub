@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SeasonService } from '../../../core/services/season.service';
 import { AdminService } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-seasons',
@@ -33,11 +34,18 @@ export class AdminSeasonsComponent implements OnInit {
   filteredLeagues = signal<any[]>([]);
   filteredTeams   = signal<any[]>([]);
 
+  // Nota Jugador
+  playerNotes: Record<string, string> = {};
+  editingNote  = signal<any>(null);
+  editNoteText = '';
+  editNoteActive = true;
+
   seasonForm: any = { name: '', leagueId: '', startDate: '', endDate: '', current: false };
 
   constructor(
     private seasonService: SeasonService,
     private adminService: AdminService,
+    private toast: ToastService
   ) {}
 
   ngOnInit() {
@@ -103,7 +111,7 @@ export class AdminSeasonsComponent implements OnInit {
     }
 
     // Cargar jugadores del equipo seleccionado
-    this.adminService.getPlayers(this.squadTeamId).subscribe(players => {
+    this.adminService.getPlayers().subscribe(players => {
       this.teamPlayers.set(players);
       this.availablePlayers.set(players);
     });
@@ -143,12 +151,15 @@ export class AdminSeasonsComponent implements OnInit {
 
   // Añadir jugador al equipo
   addPlayerToSquad(player: any) {
-    this.seasonService.addPlayer(player.id, this.squadTeamId, this.squadSeasonId)
+    const note = this.playerNotes[player.id] || '';
+    this.seasonService.addPlayer(player.id, this.squadTeamId, this.squadSeasonId, note)
       .subscribe(() => {
         this.loadSquad();
         this.searchAddPlayer = '';
+        delete this.playerNotes[player.id];
       });
   }
+
   // Eliminar jugador del equipo
   removeFromSquad(entry: any) {
     this.seasonService.removePlayer(entry.playerId, this.squadTeamId, this.squadSeasonId)
@@ -176,5 +187,42 @@ export class AdminSeasonsComponent implements OnInit {
   selectTeamForSquad(team: any) {
     this.squadTeamId = team.id;
     this.onTeamChange();
+  }
+
+  // NOTAS JUGADOR
+  toggleActive(entry: any) {
+  this.seasonService.updateNote(
+    entry.playerId, this.squadTeamId, this.squadSeasonId,
+    entry.note || '', !entry.isActive
+  ).subscribe(() => this.loadSquad());
+  }
+
+  openEditNote(entry: any) {
+    this.editingNote.set(entry);
+    this.editNoteText   = entry.note   || '';
+    this.editNoteActive = entry.isActive;
+  }
+
+  saveNote() {
+    const e = this.editingNote();
+    this.seasonService.updateNote(
+      e.playerId, this.squadTeamId, this.squadSeasonId,
+      this.editNoteText, this.editNoteActive
+    ).subscribe(() => {
+      this.loadSquad();
+      this.editingNote.set(null);
+    });
+  }
+
+  deleteFromSquad(entry: any) {
+    const nombre = `${entry.player.firstName} ${entry.player.lastName}`;
+    this.seasonService.deletePlayer(entry.playerId, this.squadTeamId, this.squadSeasonId)
+      .subscribe({
+        next: () => {
+          this.loadSquad();
+          this.toast.success(`${nombre} eliminado de la plantilla`);
+        },
+        error: () => this.toast.error(`Error al quitar a ${nombre}`)
+      });
   }
 }

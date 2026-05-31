@@ -137,4 +137,18 @@ export class TeamDetailComponent implements OnInit {
       }
     });
   }
+
+  onSeasonChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const value = select.value;
+
+    if (value === 'current') {
+      this.loadCurrentSquad();
+    } else {
+      const season = this.teamSeasons().find(s => s.id === value);
+      if (season) {
+        this.loadSeasonSquad(season);
+      }
+    }
+  }
 }

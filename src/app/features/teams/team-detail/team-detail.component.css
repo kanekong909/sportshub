@@ -636,12 +636,80 @@ h1 {
 }
 
 /* TEMPORADAS */
-.squad-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.season-selector { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.season-label { font-size: 11px; color: rgba(148,163,184,0.6); text-transform: uppercase; letter-spacing: .05em; }
-.season-pills { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.season-pill { padding: 4px 12px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: rgba(148,163,184,0.7); cursor: pointer; transition: all .15s; }
-.season-pill:hover { border-color: rgba(255,255,255,0.25); color: #f1f5f9; }
-.season-pill.active { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.4); color: #a5b4fc; font-weight: 500; }
-.squad-loading { padding: 32px; text-align: center; color: rgba(148,163,184,0.6); font-size: 14px; }
-.squad-empty { padding: 32px; text-align: center; color: rgba(148,163,184,0.5); font-size: 14px; }
+.squad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.season-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.season-label {
+  font-size: 12px;
+  color: rgba(148,163,184,0.7);
+  font-weight: 500;
+  letter-spacing: .03em;
+}
+.season-select {
+  background: rgba(30, 41, 59, 0.9);  /* Fondo oscuro consistente */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 32px 8px 14px;
+  font-size: 13px;
+  color: #ffffff;  /* Texto blanco */
+  cursor: pointer;
+  font-weight: 500;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  transition: all 0.2s ease;
+  min-width: 180px;
+}
+
+/* Estilo para las opciones del dropdown */
+.season-select option {
+  background-color: #1e293b;  /* Fondo oscuro para cada opción */
+  color: #ffffff;              /* Texto blanco para cada opción */
+}
+
+/* Opcional: hover en las opciones */
+.season-select option:hover {
+  background-color: #334155;
+}
+
+/* Estilo cuando el select está enfocado/foco */
+.season-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* Para navegadores WebKit (Chrome, Safari, Edge) */
+.season-select::-webkit-listbox {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+.squad-loading {
+  padding: 32px;
+  text-align: center;
+  color: rgba(148, 163, 184, 0.6);
+  font-size: 14px;
+}
+
+.squad-empty {
+  padding: 32px;
+  text-align: center;
+  color: rgba(148, 163, 184, 0.5);
+  font-size: 14px;
+}

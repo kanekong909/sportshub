@@ -140,6 +140,40 @@
             </div>
           }
 
+          <!-- Historial de equipos -->
+          @if (playerHistory().length > 0) {
+            <div class="glass-card">
+              <h2 class="card-title">Trayectoria</h2>
+              <div class="history-timeline">
+                @for (entry of playerHistory(); track entry.id) {
+                  <a [routerLink]="['/teams', entry.team.slug]" class="history-entry">
+                    <div class="history-season">{{ entry.season.name }}</div>
+                      <div class="history-connector">
+                        <div class="history-dot"></div>
+                        <div class="history-line"></div>
+                      </div>
+                      <div class="history-team">
+                        <div class="history-logo">
+                          @if (entry.team.logoUrl) {
+                            <img [src]="entry.team.logoUrl" [alt]="entry.team.name" />
+                          } @else {
+                            <span>{{ entry.team.name[0] }}</span>
+                          }
+                        </div>
+                        <div class="history-team-info">  <!-- ← NUEVO contenedor -->
+                          <div class="history-team-name">{{ entry.team.name }}</div>
+                          <div class="history-league">{{ entry.season.league?.name }}</div>
+                          @if (entry.note) {
+                            <div class="history-note">{{ entry.note }}</div>
+                          }
+                        </div>
+                      </div>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
         </div>
 
         <div class="content-side">
@@ -176,12 +210,6 @@
                 <div class="info-item">
                   <span class="info-key">Peso</span>
                   <span class="info-val">{{ player()!.weight }} kg</span>
-                </div>
-              }
-              @if (player()!.position?.sport) {
-                <div class="info-item">
-                  <span class="info-key">Deporte</span>
-                  <span class="info-val">{{ player()!.position!.sport.name }}</span>
                 </div>
               }
             </div>

@@ -70,26 +70,21 @@
         <div class="squad-header">
           <h2 class="card-title" style="margin-bottom:0">Plantilla</h2>
 
-          <!-- Selector de temporada -->
+         <!-- Selector de temporada - Versión dropdown -->
           @if (teamSeasons().length > 0) {
             <div class="season-selector">
-              <span class="season-label">Temporada</span>
-              <div class="season-pills">
-               <button
-                  (click)="loadCurrentSquad()"
-                  class="season-pill"
-                  [class.active]="selectedSeasonId() === ''">
-                  Actual
-                </button>
+              <label class="season-label">Temporada</label>
+              <select
+                class="season-select"
+                [value]="selectedSeasonId() === '' ? 'current' : selectedSeasonId()"
+                (change)="onSeasonChange($event)">
+                <option value="current">📅 Temporada actual</option>
                 @for (s of teamSeasons(); track s.id) {
-                  <button
-                    (click)="loadSeasonSquad(s)"
-                    class="season-pill"
-                    [class.active]="selectedSeasonId() === s.id">
-                    {{ s.name }}
-                  </button>
+                  <option [value]="s.id">
+                    {{ s.name }} {{ s.current ? '(actual)' : '' }}
+                  </option>
                 }
-              </div>
+              </select>
             </div>
           }
         </div>

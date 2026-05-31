@@ -20,15 +20,15 @@ import { AuthService } from '../../../core/services/auth.service';
 
         <div class="form-group">
           <label>Nombre</label>
-          <input type="text" [(ngModel)]="name" placeholder="Tu nombre" />
+          <input type="text" [(ngModel)]="name" placeholder="Tu nombre" class="text-black" />
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" [(ngModel)]="email" placeholder="tu@email.com" />
+          <input type="email" [(ngModel)]="email" placeholder="tu@email.com" class="text-black" />
         </div>
         <div class="form-group">
           <label>Contraseña</label>
-          <input type="password" [(ngModel)]="password" placeholder="Mínimo 8 caracteres" />
+          <input type="password" [(ngModel)]="password" placeholder="Mínimo 8 caracteres" class="text-black" />
         </div>
 
         <button class="btn-primary" (click)="register()" [disabled]="loading()">

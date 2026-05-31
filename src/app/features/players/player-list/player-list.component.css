@@ -32,23 +32,9 @@ h1 {
   gap: 12px;
 }
 
-.search-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(148, 163, 184, 0.6);
-  pointer-events: none;
-}
-
 .search-input {
   width: 100%;
-  padding: 10px 12px 10px 38px;
+  padding: 10px 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
@@ -104,18 +90,19 @@ h1 {
   font-size: 14px;
 }
 
-/* PLAYERS GRID - mobile (1 columna) */
+/* PLAYERS GRID */
 .players-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
 }
 
+/* TARJETA DE JUGADOR */
 .player-card {
   position: relative;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px; /* Bordes redondeados más suaves */
+  border-radius: 20px;
   padding: 18px;
   display: flex;
   gap: 16px;
@@ -123,21 +110,19 @@ h1 {
   text-decoration: none;
   color: inherit;
   overflow: hidden;
-  backdrop-filter: blur(8px); /* Efecto cristal de fondo */
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 }
 
-/* Efecto Hover Fluido */
 .player-card:hover {
   border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-4px) scale(1.01);
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 
-              0 0 15px rgba(255, 255, 255, 0.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* Resplandor de fondo dinámico por tarjeta */
+/* GLOW DE FONDO */
 .player-card-glow {
   position: absolute;
   top: -40px;
@@ -149,6 +134,7 @@ h1 {
   filter: blur(35px);
   pointer-events: none;
   transition: all 0.4s ease;
+  z-index: 0;
 }
 
 .player-card:hover .player-card-glow {
@@ -156,7 +142,37 @@ h1 {
   transform: scale(1.25) translate(-10px, 10px);
 }
 
-/* Avatar / Foto del Jugador */
+/* BANDERA DE FONDO (detrás de toda la tarjeta) */
+.player-flag-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.09;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 20px;
+}
+
+.player-card:hover .player-flag-background {
+  opacity: 0.25;
+}
+
+/* TODO EL CONTENIDO DEBE ESTAR POR ENCIMA DE LA BANDERA */
+.p-photo,
+.p-info,
+.card-arrow {
+  position: relative;
+  z-index: 1;
+}
+
+/* FOTO DEL JUGADOR */
 .p-photo {
   width: 56px;
   height: 56px;
@@ -175,7 +191,6 @@ h1 {
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-/* La foto resalta sutilmente en hover */
 .player-card:hover .p-photo {
   transform: scale(1.06);
   border-color: rgba(255, 255, 255, 0.3);
@@ -187,19 +202,18 @@ h1 {
   object-fit: cover;
 }
 
-/* Iniciales cuando no hay foto */
 .p-photo span {
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, #a5b4fc, #6366f1);
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #a5b4fc, #6366f1);
 }
 
-/* Información del Jugador */
+/* INFORMACIÓN DEL JUGADOR */
 .p-info {
   flex: 1;
 }
@@ -208,7 +222,6 @@ h1 {
   font-size: 16px;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.01em;
   margin-bottom: 3px;
 }
 
@@ -218,7 +231,7 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* Estilos de los Tags / Badges */
+/* TAGS */
 .p-tags {
   display: flex;
   gap: 6px;
@@ -237,22 +250,20 @@ h1 {
   letter-spacing: 0.02em;
 }
 
-/* Flecha de Acción */
+/* FLECHA */
 .card-arrow {
   color: rgba(148, 163, 184, 0.3);
   font-size: 20px;
   font-weight: 300;
-  padding-left: 4px;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s ease;
 }
 
 .player-card:hover .card-arrow {
   transform: translateX(6px);
   color: #ffffff;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
-/* Posiciones */
+/* POSICIONES */
 .pos-gk {
   background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
@@ -290,7 +301,7 @@ h1 {
 }
 
 /* ============================================ */
-/* TABLET (640px y más) */
+/* TABLET (640px+) */
 /* ============================================ */
 @media (min-width: 640px) {
   .page {
@@ -308,9 +319,8 @@ h1 {
     gap: 16px;
   }
 
-  .search-wrapper {
+  .search-input {
     width: 280px;
-    flex-shrink: 0;
   }
 
   .sport-filters {
@@ -321,10 +331,15 @@ h1 {
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
+
+  .p-photo {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 /* ============================================ */
-/* DESKTOP (1024px y más) */
+/* DESKTOP (1024px+) */
 /* ============================================ */
 @media (min-width: 1024px) {
   .page {
@@ -340,7 +355,7 @@ h1 {
     margin-bottom: 32px;
   }
 
-  .search-wrapper {
+  .search-input {
     width: 320px;
   }
 
@@ -355,8 +370,8 @@ h1 {
   }
 
   .p-photo {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     font-size: 17px;
   }
 
@@ -374,7 +389,7 @@ h1 {
 }
 
 /* ============================================ */
-/* XL SCREENS (1440px y más) */
+/* XL SCREENS (1440px+) */
 /* ============================================ */
 @media (min-width: 1440px) {
   .page {
@@ -387,15 +402,5 @@ h1 {
 
   .players-grid {
     gap: 20px;
-  }
-}
-
-/* Animaciones */
-@media (prefers-reduced-motion: no-preference) {
-  .player-card,
-  .sport-pill,
-  .search-input,
-  .card-arrow {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }

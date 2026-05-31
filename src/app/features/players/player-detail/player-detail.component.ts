@@ -5,24 +5,27 @@ import { PlayersService } from '../../../core/services/players.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Player } from '../../../core/models';
+import { SeasonService } from '../../../core/services/season.service';
 
 @Component({
   selector: 'app-player-detail',
   standalone: true,
   imports: [RouterLink, DatePipe],
   templateUrl: './player-detail.component.html',
-  styleUrl: './player-detail.component.css' 
+  styleUrl: './player-detail.component.css'
 })
 export class PlayerDetailComponent implements OnInit {
   player     = signal<Player | null>(null);
   loading    = signal(true);
   isFollowing = signal(false);
+  playerHistory = signal<any[]>([]);
 
   constructor(
     private route: ActivatedRoute,
     private playersService: PlayersService,
     private userService: UserService,
     public auth: AuthService,
+    private seasonService: SeasonService,
   ) {}
 
   ngOnInit() {
@@ -33,6 +36,7 @@ export class PlayerDetailComponent implements OnInit {
       if (this.auth.isLoggedIn()) {
         this.userService.addHistory('player', p.id).subscribe();
       }
+      this.seasonService.getPlayerHistory(p.id).subscribe(h => this.playerHistory.set(h)); 
     });
     if (this.auth.isLoggedIn()) {
       this.userService.getFollowedPlayers().subscribe(list => {
