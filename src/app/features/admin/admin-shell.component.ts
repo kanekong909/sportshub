@@ -48,7 +48,8 @@ export class AdminShellComponent {
     { path: '/admin/seasons',   icon: 'pi-calendar',     label: 'Temporadas'  },
     { path: '/admin/stadiums',  icon: 'pi-building',     label: 'Estadios'    },
     { path: '/admin/leagues',   icon: 'pi-list',         label: 'Ligas'       },
-    { path: '/admin/stats',     icon: 'pi-chart-line',  label: 'Estadísticas'},
+    { path: '/admin/stats',     icon: 'pi-chart-line',   label: 'Estadísticas'},
+    { path: '/admin/coaches',   icon: 'pi-user-edit',    label: 'Cuerpo Técnico' },
     { path: '/admin/users',     icon: 'pi-users',        label: 'Usuarios'    },
   ];
 }

@@ -180,45 +180,29 @@
 
           <!-- Datos personales -->
           <div class="glass-card">
-            <h2 class="card-title">Datos personales</h2>
+            <h2 class="card-title">Detalles</h2>
             <div class="info-list">
               @if (player()!.birthDate) {
                 <div class="info-item">
-                  <span class="info-key">Nacimiento</span>
-                  <span class="info-val">{{ player()!.birthDate | date:'d MMM y' }}</span>
+                  <span class="info-key">Edad</span>
+                  <span class="info-val">{{ getAge(player()!.birthDate) }} años</span>
                 </div>
               }
-              @if (player()!.birthPlace) {
-                <div class="info-item">
-                  <span class="info-key">Lugar</span>
-                  <span class="info-val">{{ player()!.birthPlace }}</span>
-                </div>
-              }
-              @if (player()!.nationality) {
-                <div class="info-item">
-                  <span class="info-key">Nacionalidad</span>
-                  <span class="info-val">{{ player()!.nationality }}</span>
-                </div>
-              }
-              @if (player()!.height) {
-                <div class="info-item">
-                  <span class="info-key">Altura</span>
-                  <span class="info-val">{{ player()!.height }} cm</span>
-                </div>
-              }
-              @if (player()!.weight) {
-                <div class="info-item">
-                  <span class="info-key">Peso</span>
-                  <span class="info-val">{{ player()!.weight }} kg</span>
-                </div>
-              }
+              <div class="info-item">
+                <span class="info-key">Estado</span>
+                <span class="info-val">
+                  <span [class]="player()!.active ? 'text-green-400' : 'text-red-400'">
+                    {{ player()!.active ? '✅ Activo' : '❌ Inactivo' }}
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
 
           <!-- Equipo actual -->
           @if (player()!.team) {
             <a [routerLink]="['/teams', player()!.team!.slug]" class="team-card-link">
-              <div class="glass-card team-card-inner">
+              <div class="glass-card team-card-inner mt-4">
                 <h2 class="card-title">Equipo actual</h2>
                 <div class="team-info-row">
                   <div class="team-logo-sm">

@@ -28,6 +28,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/stadiums/stadiums.component').then(m => m.StadiumsComponent),
   },
   {
+    path: 'coaches',
+    loadChildren: () => import('./features/coaches/coaches.routes').then(m => m.COACHES_ROUTES),
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),

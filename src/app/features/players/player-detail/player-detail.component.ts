@@ -10,7 +10,7 @@ import { SeasonService } from '../../../core/services/season.service';
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink],
   templateUrl: './player-detail.component.html',
   styleUrl: './player-detail.component.css'
 })
@@ -31,12 +31,20 @@ export class PlayerDetailComponent implements OnInit {
   ngOnInit() {
     const slug = this.route.snapshot.paramMap.get('slug')!;
     this.playersService.getBySlug(slug).subscribe(p => {
+      console.log('📋 Datos completos del jugador:', p);
+      console.log('🔍 SeasonStats:', p.seasonStats);
+      console.log('📊 Team:', p.team);
+      console.log('🏷️ Position:', p.position);
+
       this.player.set(p);
       this.loading.set(false);
       if (this.auth.isLoggedIn()) {
         this.userService.addHistory('player', p.id).subscribe();
       }
-      this.seasonService.getPlayerHistory(p.id).subscribe(h => this.playerHistory.set(h)); 
+      this.seasonService.getPlayerHistory(p.id).subscribe(h => {
+        console.log('📜 Historial del jugador:', h);
+        this.playerHistory.set(h)
+      });
     });
     if (this.auth.isLoggedIn()) {
       this.userService.getFollowedPlayers().subscribe(list => {
@@ -57,4 +65,25 @@ export class PlayerDetailComponent implements OnInit {
   objectEntries(obj: any): [string, any][] {
     return obj ? Object.entries(obj) : [];
   }
+
+  // player-detail.component.ts - Añade este método
+  getAge(birthDate: string | Date | null | undefined): number | string {
+    if (!birthDate) return 'No disponible';
+
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    // Verificar si la fecha es válida
+    if (isNaN(birth.getTime())) return 'No disponible';
+
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+
+    return age;
+  }
+
 }
