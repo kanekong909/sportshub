@@ -199,7 +199,13 @@
               <td class="px-4 py-3 text-gray-500">{{ team.country || '—' }}</td>
 
               <!-- JUGADORES -->
-              <td class="px-4 py-3 text-gray-500">{{ team._count?.players || 0 }}</td>
+              <td class="px-4 py-3">
+                  <button
+                    (click)="viewTeamPlayers(team)"
+                    class="text-blue-600 hover:text-blue-800 underline font-medium">
+                    {{ team._count?.players || 0 }} jugadores
+                  </button>
+                </td>
 
               <!-- ACCIONES -->
               <td class="px-4 py-3">
@@ -319,6 +325,79 @@
             </div>
           }
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de jugadores del equipo -->
+@if (showPlayersModal()) {
+  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">
+            Jugadores de {{ selectedTeam()?.name }}
+          </h2>
+          <p class="text-sm text-gray-500">{{ teamPlayers().length }} jugadores</p>
+        </div>
+        <button (click)="showPlayersModal.set(false)" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6">
+        @if (loadingPlayers()) {
+          <div class="flex justify-center items-center py-12">
+            <div class="text-gray-500">Cargando jugadores...</div>
+          </div>
+        } @else if (teamPlayers().length === 0) {
+          <div class="text-center py-12 text-gray-500">
+            <span class="text-4xl block mb-2">⚽</span>
+            <p>Este equipo no tiene jugadores registrados</p>
+          </div>
+        } @else {
+          <div class="grid gap-3">
+            @for (player of teamPlayers(); track player.id) {
+              <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <!-- Foto -->
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                  @if (player.photoUrl) {
+                    <img [src]="player.photoUrl" [alt]="player.firstName" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold">
+                      {{ player.firstName?.[0] }}{{ player.lastName?.[0] }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="font-medium text-gray-900">
+                    {{ player.firstName }} {{ player.lastName }}
+                  </div>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    @if (player.position?.code) {
+                      <span class="inline-flex items-center gap-1">
+                        <span class="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded">{{ player.position.code }}</span>
+                      </span>
+                    }
+                    @if (player.jerseyNumber) {
+                      <span>#{{ player.jerseyNumber }}</span>
+                    }
+                    @if (player.nationality) {
+                      <span>{{ player.nationality }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="px-6 py-4 border-t border-gray-100 flex justify-end sticky bottom-0 bg-white rounded-b-2xl">
+        <button (click)="showPlayersModal.set(false)" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
+          Cerrar
+        </button>
       </div>
     </div>
   </div>

@@ -154,7 +154,9 @@
                       </div>
                       <div class="history-team">
                         <div class="history-logo">
-                          @if (entry.team.logoUrl) {
+                          @if (entry.photoUrl) {
+                            <img [src]="entry.photoUrl" [alt]="entry.team.name" class="w-full h-full object-cover rounded-full" />
+                          } @else if (entry.team.logoUrl) {
                             <img [src]="entry.team.logoUrl" [alt]="entry.team.name" />
                           } @else {
                             <span>{{ entry.team.name[0] }}</span>

@@ -21,6 +21,7 @@ export class AdminSeasonsComponent implements OnInit {
   allPlayers    = signal<any[]>([]);
   availablePlayers = signal<any[]>([]);
   editingSeason = signal<any>(null);
+  editNotePhoto = '';
 
   filterLeagueId = '';
   squadTeamId    = '';
@@ -253,13 +254,14 @@ export class AdminSeasonsComponent implements OnInit {
     this.editingNote.set(entry);
     this.editNoteText   = entry.note   || '';
     this.editNoteActive = entry.isActive;
+    this.editNotePhoto  = entry.photoUrl || '';
   }
 
   saveNote() {
     const e = this.editingNote();
     this.seasonService.updateNote(
       e.playerId, this.squadTeamId, this.squadSeasonId,
-      this.editNoteText, this.editNoteActive
+      this.editNoteText, this.editNoteActive, this.editNotePhoto
     ).subscribe({
       next: () => {
         this.toast.success('Nota actualizada');

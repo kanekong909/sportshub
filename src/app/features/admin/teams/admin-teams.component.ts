@@ -22,6 +22,11 @@ export class AdminTeamsComponent implements OnInit {
   selectedLeague = signal<string>(''); // Nuevo: filtro por liga
   imageUrl       = '';
 
+  // Mostrar Jugadores
+  showPlayersModal = signal(false);
+  teamPlayers = signal<any[]>([]);
+  loadingPlayers = signal(false);
+
   // 2. Formulario como objeto plano
   form: any = {
     name: '', shortName: '', country: '', city: '',
@@ -286,5 +291,20 @@ export class AdminTeamsComponent implements OnInit {
       return this.availableLeagues();
     }
     return this.availableLeagues().filter(league => league.sportId === sportFilter);
+  }
+
+  // Mostrar Jugadores
+  viewTeamPlayers(team: any) {
+    this.selectedTeam.set(team);
+    this.loadingPlayers.set(true);
+    this.showPlayersModal.set(true);
+
+    this.admin.getPlayers(team.id, '').subscribe({
+      next: (players) => {
+        this.teamPlayers.set(players);
+        this.loadingPlayers.set(false);
+      },
+      error: () => this.loadingPlayers.set(false)
+    });
   }
 }

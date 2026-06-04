@@ -57,6 +57,42 @@ export class TeamDetailComponent implements OnInit {
     return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
   });
 
+  // Jugadores por posicion
+  playersByPosition = computed(() => {
+    const players = this.displayPlayers();
+    const groups = new Map<string, any[]>();
+
+    // Orden de posiciones para mostrar
+    const positionOrder = ['GK', 'DEF', 'MID', 'FWD'];
+
+    // Inicializar grupos vacíos
+    positionOrder.forEach(pos => groups.set(pos, []));
+    groups.set('other', []);
+
+    // Clasificar jugadores
+    players.forEach(player => {
+      const code = player.position?.code?.toUpperCase() || '';
+      if (positionOrder.includes(code)) {
+        groups.get(code)?.push(player);
+      } else {
+        groups.get('other')?.push(player);
+      }
+    });
+
+    // Ordenar jugadores por número de camiseta dentro de cada grupo
+    groups.forEach((playersList, key) => {
+      playersList.sort((a, b) => (a.jerseyNumber || 999) - (b.jerseyNumber || 999));
+    });
+
+    return {
+      GK: { players: groups.get('GK') || [], label: 'Porteros', icon: '🧤' },
+      DEF: { players: groups.get('DEF') || [], label: 'Defensas', icon: '🛡️' },
+      MID: { players: groups.get('MID') || [], label: 'Mediocampistas', icon: '⚡' },
+      FWD: { players: groups.get('FWD') || [], label: 'Delanteros', icon: '🎯' },
+      other: { players: groups.get('other') || [], label: 'Otros', icon: '🏃' }
+    };
+  });
+
   constructor(
     private route: ActivatedRoute,
     private teamsService: TeamsService,

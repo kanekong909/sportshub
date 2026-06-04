@@ -328,10 +328,25 @@
       </div>
       <div class="p-5 flex flex-col gap-4">
         <div>
+          <!-- Nota para esta temporada (opcional) -->
           <label class="block text-xs font-medium text-gray-600 mb-1">Nota</label>
           <textarea [(ngModel)]="editNoteText" rows="3" placeholder="Ej: Jugó en Sub-17, cedido, lesionado..."
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400 resize-none"></textarea>
         </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Foto con esta camiseta (URL)</label>
+          <div class="flex gap-2 items-start">
+            @if (editingNote()?.photoUrl || editNotePhoto) {
+              <img [src]="editNotePhoto || editingNote()?.photoUrl"
+                class="w-10 h-10 rounded-full object-cover border border-gray-200 flex-shrink-0" />
+            }
+            <input [(ngModel)]="editNotePhoto" placeholder="https://..."
+              class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
+          </div>
+        </div>
+
+        <!-- Activo en esta temporada? -->
         <div class="flex items-center gap-2">
           <input [(ngModel)]="editNoteActive" type="checkbox" id="editActive" />
           <label for="editActive" class="text-sm text-gray-700">Jugador activo en esta temporada</label>

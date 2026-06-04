@@ -70,7 +70,6 @@
         <div class="squad-header">
           <h2 class="card-title" style="margin-bottom:0">Plantilla</h2>
 
-         <!-- Selector de temporada - Versión dropdown -->
           @if (teamSeasons().length > 0) {
             <div class="season-selector">
               <label class="season-label">Temporada</label>
@@ -94,23 +93,143 @@
         } @else if (displayPlayers().length === 0) {
           <div class="squad-empty">No hay jugadores registrados para esta temporada</div>
         } @else {
-          <div class="squad-grid">
-            @for (player of displayPlayers(); track player.id) {
-              <a [routerLink]="['/players', player.slug]" class="squad-card">
-                <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
-                <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
-                  @if (player.photoUrl) {
-                    <img [src]="player.photoUrl" [alt]="player.firstName" />
-                  } @else {
-                    <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
-                  }
-                </div>
-                <div class="sq-num">#{{ player.jerseyNumber }}</div>
-                <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
-                <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code }}</span>
-              </a>
-            }
-          </div>
+          <!-- Agrupar por posición -->
+          @let positions = playersByPosition();
+
+          @if (positions.GK.players.length > 0) {
+            <div class="position-group">
+              <div class="position-header">
+                <span class="position-icon">{{ positions.GK.icon }}</span>
+                <h3 class="position-title">{{ positions.GK.label }}</h3>
+                <span class="position-count">{{ positions.GK.players.length }} jugadores</span>
+              </div>
+              <div class="squad-grid">
+                @for (player of positions.GK.players; track player.id) {
+                  <a [routerLink]="['/players', player.slug]" class="squad-card">
+                    <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                    <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                      @if (player.photoUrl) {
+                        <img [src]="player.photoUrl" [alt]="player.firstName" />
+                      } @else {
+                        <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                      }
+                    </div>
+                    <div class="sq-num">#{{ player.jerseyNumber || '—' }}</div>
+                    <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                    <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code || '—' }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          @if (positions.DEF.players.length > 0) {
+            <div class="position-group">
+              <div class="position-header">
+                <span class="position-icon">{{ positions.DEF.icon }}</span>
+                <h3 class="position-title">{{ positions.DEF.label }}</h3>
+                <span class="position-count">{{ positions.DEF.players.length }} jugadores</span>
+              </div>
+              <div class="squad-grid">
+                @for (player of positions.DEF.players; track player.id) {
+                  <a [routerLink]="['/players', player.slug]" class="squad-card">
+                    <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                    <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                      @if (player.photoUrl) {
+                        <img [src]="player.photoUrl" [alt]="player.firstName" />
+                      } @else {
+                        <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                      }
+                    </div>
+                    <div class="sq-num">#{{ player.jerseyNumber || '—' }}</div>
+                    <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                    <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code || '—' }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          @if (positions.MID.players.length > 0) {
+            <div class="position-group">
+              <div class="position-header">
+                <span class="position-icon">{{ positions.MID.icon }}</span>
+                <h3 class="position-title">{{ positions.MID.label }}</h3>
+                <span class="position-count">{{ positions.MID.players.length }} jugadores</span>
+              </div>
+              <div class="squad-grid">
+                @for (player of positions.MID.players; track player.id) {
+                  <a [routerLink]="['/players', player.slug]" class="squad-card">
+                    <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                    <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                      @if (player.photoUrl) {
+                        <img [src]="player.photoUrl" [alt]="player.firstName" />
+                      } @else {
+                        <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                      }
+                    </div>
+                    <div class="sq-num">#{{ player.jerseyNumber || '—' }}</div>
+                    <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                    <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code || '—' }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          @if (positions.FWD.players.length > 0) {
+            <div class="position-group">
+              <div class="position-header">
+                <span class="position-icon">{{ positions.FWD.icon }}</span>
+                <h3 class="position-title">{{ positions.FWD.label }}</h3>
+                <span class="position-count">{{ positions.FWD.players.length }} jugadores</span>
+              </div>
+              <div class="squad-grid">
+                @for (player of positions.FWD.players; track player.id) {
+                  <a [routerLink]="['/players', player.slug]" class="squad-card">
+                    <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                    <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                      @if (player.photoUrl) {
+                        <img [src]="player.photoUrl" [alt]="player.firstName" />
+                      } @else {
+                        <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                      }
+                    </div>
+                    <div class="sq-num">#{{ player.jerseyNumber || '—' }}</div>
+                    <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                    <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code || '—' }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          @if (positions.other.players.length > 0) {
+            <div class="position-group">
+              <div class="position-header">
+                <span class="position-icon">{{ positions.other.icon }}</span>
+                <h3 class="position-title">{{ positions.other.label }}</h3>
+                <span class="position-count">{{ positions.other.players.length }} jugadores</span>
+              </div>
+              <div class="squad-grid">
+                @for (player of positions.other.players; track player.id) {
+                  <a [routerLink]="['/players', player.slug]" class="squad-card">
+                    <div class="team-card-glow" [style.background]="team()!.primaryColor || '#3b82f6'"></div>
+                    <div class="sq-photo" [style.background]="(team()!.primaryColor || '#3b82f6') + '18'">
+                      @if (player.photoUrl) {
+                        <img [src]="player.photoUrl" [alt]="player.firstName" />
+                      } @else {
+                        <span>{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                      }
+                    </div>
+                    <div class="sq-num">#{{ player.jerseyNumber || '—' }}</div>
+                    <div class="sq-name">{{ player.firstName }} {{ player.lastName }}</div>
+                    <span class="pos-badge pos-{{ player.position?.code?.toLowerCase() }}">{{ player.position?.code || '—' }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
         }
       </div>
     }

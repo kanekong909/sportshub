@@ -16,8 +16,8 @@ import { AdminService } from '../../../core/services/admin.service';
         <button (click)="openCreate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">+ Nuevo jugador</button>
       </div>
 
-      <input [(ngModel)]="search" (ngModelChange)="load()" placeholder="Buscar jugador..."
-        class="mb-4 w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
+      <input [(ngModel)]="search" (ngModelChange)="onSearchChange()" placeholder="Buscar jugador..."
+  class="mb-4 w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-400" />
 
       <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <table class="w-full text-sm">
@@ -163,10 +163,13 @@ export class AdminPlayersComponent implements OnInit {
   search         = '';
   imageUrl       = '';
   form: any      = {};
+  searchTimeout: any;
 
   constructor(private admin: AdminService) {}
   ngOnInit() { this.load(); }
-  load() { this.admin.getPlayers(this.search).subscribe(p => this.players.set(p)); }
+  load() {
+    this.admin.getPlayers('', this.search).subscribe(p => this.players.set(p));
+  }
 
   openCreate() { this.form = {}; this.editing.set(null); this.showForm.set(true); }
   openEdit(p: any) { this.form = { ...p }; this.editing.set(p); this.showForm.set(true); }
@@ -199,5 +202,12 @@ export class AdminPlayersComponent implements OnInit {
     this.admin.uploadPlayerPhoto(this.selectedPlayer().id, this.selectedFile()!).subscribe(u => {
       this.selectedPlayer.set(u); this.selectedFile.set(null); this.uploading.set(false); this.load();
     });
+  }
+
+  onSearchChange() {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.load();
+    }, 300);
   }
 }

@@ -20,8 +20,11 @@ export class SeasonService {
   getSquad(teamId: string, seasonId: string) {
     return this.http.get<any[]>(`${this.api}/squad`, { params: { teamId, seasonId } });
   }
-  addPlayer(playerId: string, teamId: string, seasonId: string, note = '') {
-    return this.http.post(`${this.api}/squad`, { playerId, teamId, seasonId, note });
+  addPlayer(playerId: string, teamId: string, seasonId: string, note = '', photoUrl = '') {
+  return this.http.post(`${this.api}/squad`, { playerId, teamId, seasonId, note, photoUrl });
+  }
+  updateSeasonPhoto(playerId: string, teamId: string, seasonId: string, photoUrl: string) {
+    return this.http.put(`${this.api}/squad/photo`, { playerId, teamId, seasonId, photoUrl });
   }
   removePlayer(playerId: string, teamId: string, seasonId: string) {
     return this.http.delete(`${this.api}/squad`, { body: { playerId, teamId, seasonId } });
@@ -31,8 +34,8 @@ export class SeasonService {
     body: { playerId, teamId, seasonId }
   });
   }
-  updateNote(playerId: string, teamId: string, seasonId: string, note: string, isActive: boolean) {
-    return this.http.put(`${this.api}/squad/note`, { playerId, teamId, seasonId, note, isActive });
+  updateNote(playerId: string, teamId: string, seasonId: string, note: string, isActive: boolean, photoUrl = '') {
+    return this.http.put(`${this.api}/squad/note`, { playerId, teamId, seasonId, note, isActive, photoUrl });
   }
   getPlayerHistory(playerId: string) {
     return this.http.get<any[]>(`${this.api}/player/${playerId}/history`);
@@ -40,6 +43,5 @@ export class SeasonService {
   getCurrentSquad(teamId: string) {
     return this.http.get<any[]>(`${this.api}/team/${teamId}/current`);
   }
-
 
 }
