@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TeamsService } from '../../../core/services/teams.service';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeasonService } from '../../../core/services/season.service';
@@ -9,7 +10,7 @@ import { Team } from '../../../core/models';
 @Component({
   selector: 'app-team-detail',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   templateUrl: './team-detail.component.html',
   styleUrl: './team-detail.component.css'
 })
@@ -19,6 +20,11 @@ export class TeamDetailComponent implements OnInit {
   loading = signal(true);
   isFavorite = signal(false);
   activeTab = signal('squad');
+
+  // Añade este signal para las estadísticas
+  seasonStats = signal<any[]>([]);
+  statsLoading = signal(false);
+  leaguesList = signal<any[]>([]);
 
   tabs = [
     { key: 'squad',   label: 'Plantilla'    },
@@ -33,7 +39,10 @@ export class TeamDetailComponent implements OnInit {
   displayPlayers   = signal<any[]>([]);
   squadLoading     = signal(false);
 
-  // 2. Signals Computados (Se calculan automáticamente cuando 'team' cambia)
+  selectedLeagueId = signal<string>('');
+  filteredSeasonStats = signal<any[]>([]);
+
+  // 2. Signals Computados
   heroStats = computed(() => {
     const t = this.team();
     if (!t) return [];
@@ -62,14 +71,10 @@ export class TeamDetailComponent implements OnInit {
     const players = this.displayPlayers();
     const groups = new Map<string, any[]>();
 
-    // Orden de posiciones para mostrar
     const positionOrder = ['GK', 'DEF', 'MID', 'FWD'];
-
-    // Inicializar grupos vacíos
     positionOrder.forEach(pos => groups.set(pos, []));
     groups.set('other', []);
 
-    // Clasificar jugadores
     players.forEach(player => {
       const code = player.position?.code?.toUpperCase() || '';
       if (positionOrder.includes(code)) {
@@ -79,7 +84,6 @@ export class TeamDetailComponent implements OnInit {
       }
     });
 
-    // Ordenar jugadores por número de camiseta dentro de cada grupo
     groups.forEach((playersList, key) => {
       playersList.sort((a, b) => (a.jerseyNumber || 999) - (b.jerseyNumber || 999));
     });
@@ -91,6 +95,15 @@ export class TeamDetailComponent implements OnInit {
       FWD: { players: groups.get('FWD') || [], label: 'Delanteros', icon: '🎯' },
       other: { players: groups.get('other') || [], label: 'Otros', icon: '🏃' }
     };
+  });
+
+  // Filtrar ligas
+  filteredStats = computed(() => {
+    const stats = this.seasonStats();
+    const leagueId = this.selectedLeagueId();
+
+    if (!leagueId) return stats;
+    return stats.filter(s => s.league?.id === leagueId || s.leagueId === leagueId);
   });
 
   constructor(
@@ -107,12 +120,14 @@ export class TeamDetailComponent implements OnInit {
       next: (team) => {
         this.team.set(team);
         this.loading.set(false);
-        // this.displayPlayers.set(team.players || []);
         this.loadCurrentSquad();
         this.loadTeamSeasons(slug);
+        // Cargar estadísticas por separado para asegurar que vengan todas
+        this.loadTeamStats(slug);
       },
       error: () => this.loading.set(false)
     });
+
     if (this.auth.isLoggedIn()) {
       this.userService.getFavoriteTeams().subscribe({
         next: (favs) => {
@@ -120,6 +135,32 @@ export class TeamDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Nuevo método para cargar todas las estadísticas
+  loadTeamStats(slug: string) {
+    this.statsLoading.set(true);
+    this.teamsService.getStats(slug).subscribe({
+      next: (stats) => {
+        this.seasonStats.set(stats);
+        this.filteredSeasonStats.set(stats);
+
+        // Extraer ligas únicas para el filtro
+        const uniqueLeagues = new Map();
+        stats.forEach((stat: any) => {
+          const league = stat.league;
+          if (league && !uniqueLeagues.has(league.id)) {
+            uniqueLeagues.set(league.id, league);
+          }
+        });
+        this.leaguesList.set(Array.from(uniqueLeagues.values()));
+        this.statsLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading team stats:', err);
+        this.statsLoading.set(false);
+      }
+    });
   }
 
   toggleFavorite() {
@@ -152,7 +193,7 @@ export class TeamDetailComponent implements OnInit {
     this.teamsService.getSquadBySeason(slug, season.id).subscribe(entries => {
       this.displayPlayers.set(entries.map((e: any) => ({
         ...e.player,
-        photoUrl: e.photoUrl || e.player.photoUrl, // foto de temporada primero, luego la general
+        photoUrl: e.photoUrl || e.player.photoUrl,
       })));
       this.squadLoading.set(false);
     });
@@ -165,9 +206,8 @@ export class TeamDetailComponent implements OnInit {
     this.squadLoading.set(true);
     this.seasonService.getCurrentSquad(currentTeam.id).subscribe({
       next: (data) => {
-        // data viene como PlayerSeasonTeam[] con player anidado
         this.displayPlayers.set(data.map((item: any) => item.player));
-        this.selectedSeasonId.set(''); // marca "Actual" como seleccionado
+        this.selectedSeasonId.set('');
         this.squadLoading.set(false);
       },
       error: () => {

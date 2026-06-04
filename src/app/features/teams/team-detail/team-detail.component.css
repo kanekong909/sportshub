@@ -508,6 +508,43 @@ h1 {
 }
 
 /* ============================================ */
+/* ESTADIO - IMAGEN */
+/* ============================================ */
+.stadium-image-container {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.stadium-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.stadium-image:hover {
+  transform: scale(1.02);
+}
+
+/* Si quieres que la imagen sea responsive y centrada */
+@media (min-width: 768px) {
+  .stadium-image-container {
+    max-height: 350px;
+  }
+
+  .stadium-image {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+  }
+}
+
+/* ============================================ */
 /* PALMARÉS (TITLES GRID) */
 /* ============================================ */
 .titles-grid {
@@ -768,5 +805,199 @@ h1 {
 
   .position-title {
     font-size: 18px;
+  }
+
+
+}
+
+
+/* SEASONS NEW STYLES */
+/* Estadísticas */
+.stats-loading,
+.stats-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: rgba(148, 163, 184, 0.6);
+  font-size: 14px;
+}
+
+/* Mejora la tabla para que sea más legible */
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 650px;
+}
+
+.stats-table th {
+  padding: 12px;
+  text-align: left;
+  color: #94a3b8;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.stats-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+.stats-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: #ffffff;
+}
+
+.stats-table b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+
+/* Header de estadísticas con filtro */
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.league-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.league-select {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 32px 8px 14px;
+  font-size: 13px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* Celda de liga con logo */
+.league-cell {
+  min-width: 180px;
+}
+
+.league-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.league-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Ajuste responsive */
+@media (max-width: 768px) {
+  .stats-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .league-filter {
+    justify-content: space-between;
+  }
+
+  .league-cell {
+    min-width: 140px;
+  }
+}
+
+/* LOGO Y SELECT DE LIGA */
+/* Header de estadísticas con filtro */
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.league-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.league-select {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 32px 8px 14px;
+  font-size: 13px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* Celda de liga con logo */
+.league-cell {
+  min-width: 180px;
+}
+
+.league-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.league-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+/* Ajuste responsive */
+@media (max-width: 768px) {
+  .stats-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .league-filter {
+    justify-content: space-between;
+  }
+
+  .league-cell {
+    min-width: 140px;
   }
 }
