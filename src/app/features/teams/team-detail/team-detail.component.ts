@@ -150,7 +150,10 @@ export class TeamDetailComponent implements OnInit {
     this.squadLoading.set(true);
     const slug = this.route.snapshot.paramMap.get('slug')!;
     this.teamsService.getSquadBySeason(slug, season.id).subscribe(entries => {
-      this.displayPlayers.set(entries.map((e: any) => e.player));
+      this.displayPlayers.set(entries.map((e: any) => ({
+        ...e.player,
+        photoUrl: e.photoUrl || e.player.photoUrl, // foto de temporada primero, luego la general
+      })));
       this.squadLoading.set(false);
     });
   }

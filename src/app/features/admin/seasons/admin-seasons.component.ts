@@ -22,6 +22,7 @@ export class AdminSeasonsComponent implements OnInit {
   availablePlayers = signal<any[]>([]);
   editingSeason = signal<any>(null);
   editNotePhoto = '';
+  filteredSeasons = signal<any[]>([]);
 
   filterLeagueId = '';
   squadTeamId    = '';
@@ -46,7 +47,7 @@ export class AdminSeasonsComponent implements OnInit {
   constructor(
     private seasonService: SeasonService,
     private adminService: AdminService,
-    private toast: ToastService  // ← Asegúrate de que esté inyectado
+    private toast: ToastService
   ) {}
 
   ngOnInit() {
@@ -63,14 +64,28 @@ export class AdminSeasonsComponent implements OnInit {
   }
 
   loadSeasons() {
-    this.adminService.getAllSeasons(this.filterLeagueId || undefined)
+    if (!this.filterLeagueId) {
+      this.seasons.set([]);
+      this.filteredSeasons.set([]);
+      return;
+    }
+
+    this.adminService.getAllSeasons(this.filterLeagueId)
       .subscribe({
-        next: (s) => this.seasons.set(s),
+        next: (s) => {
+          this.seasons.set(s);
+          this.filteredSeasons.set(s);
+        },
         error: (err) => {
           console.error('Error loading seasons:', err);
           this.toast.error('Error al cargar las temporadas');
         }
       });
+  }
+
+  selectLeague(leagueId: string) {
+    this.filterLeagueId = leagueId;
+    this.loadSeasons();
   }
 
   openCreateSeason() {
@@ -137,13 +152,11 @@ export class AdminSeasonsComponent implements OnInit {
       return;
     }
 
-    // Cargar jugadores del equipo seleccionado
     this.adminService.getPlayers().subscribe(players => {
       this.teamPlayers.set(players);
       this.availablePlayers.set(players);
     });
 
-    // Buscar temporadas del equipo
     const team = this.teams().find(t => t.id === this.squadTeamId);
     if (!team) return;
     const leagueIds = team.leagues?.map((l: any) => l.leagueId) || [];
@@ -288,5 +301,13 @@ export class AdminSeasonsComponent implements OnInit {
           this.toast.error(`Error al quitar a ${nombre}`);
         }
       });
+  }
+
+  formatUtcDate(dateString: string): string {
+    if (!dateString) return '';
+
+    // Extraer año, mes, día directamente de la string (asumiendo formato YYYY-MM-DD)
+    const [year, month, day] = dateString.split('T')[0].split('-');
+    return `${day}/${month}/${year}`;
   }
 }

@@ -19,68 +19,101 @@
       <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
         <h2 class="text-sm font-semibold text-gray-900">Temporadas creadas</h2>
         <button (click)="openCreateSeason()"
-          class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
+          class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700"
+          [disabled]="!filterLeagueId">
           + Nueva
         </button>
       </div>
 
-      <!-- Filtro por liga -->
+      <!-- Selector de liga -->
       <div class="px-5 py-3 border-b border-gray-50">
-        <input [(ngModel)]="searchLeague" (ngModelChange)="filterLeagues()" placeholder="Buscar liga..."
+        <label class="block text-xs font-medium text-gray-600 mb-2">Selecciona una liga</label>
+        <input [(ngModel)]="searchLeague" (ngModelChange)="filterLeagues()"
+          placeholder="Buscar liga..."
           class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400 mb-2" />
-        <div class="max-h-40 overflow-y-auto space-y-1">
-          <div (click)="filterLeagueId=''; searchLeague=''; filteredLeagues.set(leagues()); loadSeasons()"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-50"
-            [class.bg-blue-50]="filterLeagueId === ''">
-            <span class="text-sm text-gray-500">Todas las ligas</span>
-          </div>
+
+        <div class="max-h-48 overflow-y-auto space-y-1">
           @for (l of filteredLeagues(); track l.id) {
-          <div (click)="filterLeagueId=l.id; loadSeasons()"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-50"
+          <div (click)="selectLeague(l.id)"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
             [class.bg-blue-50]="filterLeagueId === l.id">
             @if (l.logoUrl) {
             <img [src]="l.logoUrl" class="w-5 h-5 object-contain flex-shrink-0" />
             } @else {
-            <div
-              class="w-5 h-5 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400 flex-shrink-0">
-              {{ l.name[0] }}</div>
+            <div class="w-5 h-5 rounded bg-gray-200 flex items-center justify-center text-xs text-gray-400 flex-shrink-0">
+              {{ l.name[0] }}
+            </div>
             }
             <div class="flex-1 min-w-0">
               <div class="text-sm text-gray-900 truncate">{{ l.name }}</div>
               <div class="text-xs text-gray-400">{{ l.sport?.name }}</div>
             </div>
+            @if (filterLeagueId === l.id) {
+            <span class="text-blue-600 text-xs">✓</span>
+            }
           </div>
           }
         </div>
       </div>
 
-      <div class="divide-y divide-gray-50 max-h-96 overflow-y-auto">
-        @for (s of seasons(); track s.id) {
-        <div class="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-gray-900">{{ s.name }}</span>
-              @if (s.current) {
-              <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Actual</span>
-              }
-            </div>
-            <div class="text-xs text-gray-400 mt-0.5">{{ s.league?.name }}</div>
-          </div>
-          <div class="flex gap-2">
-            @if (!s.current) {
-            <button (click)="setCurrent(s)" class="text-xs text-green-600 hover:text-green-800 font-medium">
-              Marcar actual
-            </button>
-            }
-            <button (click)="openEditSeason(s)" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
-              Editar
-            </button>
-          </div>
+      <!-- Temporadas de la liga seleccionada -->
+      <div class="border-t border-gray-100">
+        <div class="px-5 py-3 bg-gray-50 border-b border-gray-100">
+          <span class="text-xs font-medium text-gray-600">
+            Temporadas de {{ leagues().find(l => l.id === filterLeagueId)?.name || 'la liga seleccionada' }}
+          </span>
         </div>
-        }
-        @if (seasons().length === 0) {
-        <div class="px-5 py-8 text-center text-gray-400 text-sm">No hay temporadas creadas</div>
-        }
+
+        <div class="divide-y divide-gray-50 max-h-96 overflow-y-auto">
+          @if (!filterLeagueId) {
+          <div class="px-5 py-8 text-center text-gray-400 text-sm">
+            Selecciona una liga para ver sus temporadas
+          </div>
+          } @else if (seasons().length === 0) {
+            <div class="px-5 py-8 text-center text-gray-400 text-sm">
+              No hay temporadas creadas para esta liga
+            </div>
+          } @else {
+            @for (s of seasons(); track s.id) {
+            <div class="px-5 py-3 flex items-center gap-3 hover:bg-gray-50">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-gray-900">{{ s.name }}</span>
+                  @if (s.current) {
+                  <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Actual</span>
+                  }
+                </div>
+                <!-- Fechas en línea separada -->
+                <div class="text-xs text-gray-400 mt-1">
+                  {{ s.league?.name }}
+                  @if (s.startDate || s.endDate) {
+                  <span class="text-gray-400">
+                    ·
+                    @if (s.startDate && s.endDate) {
+                    {{ formatUtcDate(s.startDate) }} - {{ formatUtcDate(s.endDate) }}
+                    } @else if (s.startDate) {
+                    Desde: {{ formatUtcDate(s.startDate) }}
+                    } @else if (s.endDate) {
+                    Hasta: {{ formatUtcDate(s.endDate) }}
+                    }
+                  </span>
+                  }
+                </div>
+              </div>
+              <div class="flex gap-2">
+                @if (!s.current) {
+                <button (click)="setCurrent(s)" class="text-xs text-green-600 hover:text-green-800 font-medium">
+                  Marcar actual
+                </button>
+                }
+                <button (click)="openEditSeason(s)" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                  Editar
+                </button>
+              </div>
+            </div>
+            }
+          }
+        </div>
       </div>
     </div>
 
@@ -90,21 +123,29 @@
         {{ editingSeason() ? 'Editar temporada' : 'Nueva temporada' }}
       </h2>
       <div class="flex flex-col gap-4">
+
+        <!-- Nombre de la temporada -->
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
           <input [(ngModel)]="seasonForm.name" placeholder="2024-25"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
         </div>
+
+        <!-- Select Liga -->
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">Liga *</label>
           <select [(ngModel)]="seasonForm.leagueId"
             class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400">
             <option value="">Seleccionar liga...</option>
             @for (l of leagues(); track l.id) {
-            <option [value]="l.id">{{ l.name }} — {{ l.sport?.name }}</option>
+            <option [value]="l.id" [selected]="filterLeagueId === l.id">
+              {{ l.name }} — {{ l.sport?.name }}
+            </option>
             }
           </select>
         </div>
+
+        <!-- Fecha inicio y fin -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Fecha inicio</label>
@@ -117,10 +158,14 @@
               class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:border-blue-400" />
           </div>
         </div>
+
+        <!-- Marcar como temporada actual -->
         <div class="flex items-center gap-2">
           <input [(ngModel)]="seasonForm.current" type="checkbox" id="current" class="rounded" />
           <label for="current" class="text-sm text-gray-700">Marcar como temporada actual</label>
         </div>
+
+        <!-- Botones de guardar/cancelar -->
         <div class="flex gap-3 pt-2">
           @if (editingSeason()) {
           <button (click)="cancelEditSeason()"
